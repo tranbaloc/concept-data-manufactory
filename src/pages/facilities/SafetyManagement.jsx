@@ -1,15 +1,22 @@
 import { useState, useEffect } from 'react'
 
 /* ── Camera metadata ──────────────────────────────────────────────────────── */
+// Verified free Unsplash photo IDs (fetched from live search results)
 const CAMS = [
-  { id:'CAM-S01', name:'Khu chiết rót', area:'Line 1 & 2',   seed:237, alert:true,
+  { id:'CAM-S01', name:'Khu chiết rót', area:'Line 1 & 2', alert:true,
+    img:'https://images.unsplash.com/photo-1780145180040-0beda1df60e6?w=640&h=360&fit=crop&q=75',
     box:{x:'18%',y:'22%',w:'28%',h:'38%'}, label:'⚠ Không đeo khẩu trang' },
-  { id:'CAM-S02', name:'Kho nguyên liệu', area:'Kho A-B',    seed:342, alert:false },
-  { id:'CAM-S03', name:'Phòng điện cao thế', area:'Tầng 2',  seed:118, alert:true,
+  { id:'CAM-S02', name:'Kho nguyên liệu', area:'Kho A-B', alert:false,
+    img:'https://images.unsplash.com/photo-1553413077-190dd305871c?w=640&h=360&fit=crop&q=75' },
+  { id:'CAM-S03', name:'Phòng điện cao thế', area:'Tầng 2', alert:true,
+    img:'https://images.unsplash.com/photo-1504328345606-18bbc8c9d7d1?w=640&h=360&fit=crop&q=75',
     box:{x:'55%',y:'15%',w:'24%',h:'44%'}, label:'⚠ Vào khu vực cấm' },
-  { id:'CAM-S04', name:'Cổng ra vào',   area:'Cổng chính',   seed:489, alert:false },
-  { id:'CAM-S05', name:'Khu pha chế',   area:'Phòng pha chế',seed:156, alert:false },
-  { id:'CAM-S06', name:'Bãi đỗ xe',     area:'Ngoài trời',   seed:571, alert:false },
+  { id:'CAM-S04', name:'Cổng ra vào', area:'Cổng chính', alert:false,
+    img:'https://images.unsplash.com/photo-1779600493796-1f3d68589cee?w=640&h=360&fit=crop&q=75' },
+  { id:'CAM-S05', name:'Khu pha chế', area:'Phòng pha chế', alert:false,
+    img:'https://images.unsplash.com/photo-1608899466500-0d83b26d1639?w=640&h=360&fit=crop&q=75' },
+  { id:'CAM-S06', name:'Bãi xe & Sân ngoài', area:'Ngoài trời', alert:false,
+    img:'https://images.unsplash.com/photo-1778016193071-c841d6a2fc6a?w=640&h=360&fit=crop&q=75' },
 ]
 
 /* ── CSS injected once for scan-line + blink animations ─────────────────── */
@@ -29,11 +36,11 @@ const STYLE = `
 .cam-scanline {
   background: repeating-linear-gradient(
     to bottom,
-    transparent 0px, transparent 3px,
-    rgba(0,0,0,.13) 3px, rgba(0,0,0,.13) 4px
+    transparent 0px, transparent 2px,
+    rgba(0,0,0,.22) 2px, rgba(0,0,0,.22) 3px
   );
-  background-size: 100% 4px;
-  animation: scanline 8s linear infinite;
+  background-size: 100% 3px;
+  animation: scanline 6s linear infinite;
 }
 .cam-rec { animation: blink-rec 1.2s step-start infinite }
 .cam-alert-box { animation: detect-pulse 1.5s ease-in-out infinite }
@@ -50,18 +57,16 @@ function CamFeed({ cam, large }) {
     fmt(); const t = setInterval(fmt, 1000); return ()=>clearInterval(t)
   },[])
 
-  const h = large ? 200 : 160
-
   return (
     <div style={{ position:'relative', borderRadius:10, overflow:'hidden',
-      background:'#000', cursor:'pointer',
+      background:'#000', cursor:'pointer', aspectRatio:'16/9',
       boxShadow: cam.alert ? '0 0 0 2px #ef4444, 0 4px 16px rgba(239,68,68,.3)'
                            : '0 2px 10px rgba(0,0,0,.4)' }}>
 
-      {/* Base image — green night-vision filter */}
-      <img src={`https://picsum.photos/seed/${cam.seed}/640/${h*2}`}
-        style={{ width:'100%', height:h, objectFit:'cover', display:'block',
-          filter:'grayscale(80%) sepia(60%) hue-rotate(75deg) contrast(1.15) brightness(.62)' }}
+      {/* Base image — green night-vision filter, fills 16:9 container */}
+      <img src={cam.img}
+        style={{ width:'100%', height:'100%', objectFit:'cover', display:'block',
+          filter:'contrast(1.25) brightness(0.82) saturate(1.1)' }}
         loading="lazy"
       />
 
@@ -71,7 +76,7 @@ function CamFeed({ cam, large }) {
 
       {/* Vignette */}
       <div style={{ position:'absolute', inset:0, pointerEvents:'none',
-        background:'radial-gradient(ellipse at center, transparent 60%, rgba(0,0,0,.55) 100%)' }}/>
+        background:'radial-gradient(ellipse at center, transparent 45%, rgba(0,0,0,.7) 100%)' }}/>
 
       {/* AI detection box */}
       {cam.alert && cam.box && (

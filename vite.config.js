@@ -7,5 +7,6 @@ export default defineConfig({
   server: {
     host: true,   // lắng nghe trên 0.0.0.0 → các máy khác truy cập qua IP
     port: 5173,
+    allowedHosts: ['giavico-concept.tranbaloc.io.vn'],
   },
 })

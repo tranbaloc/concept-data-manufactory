@@ -1,0 +1,82 @@
+/**
+ * FormsPanel — sticky right sidebar listing all forms for a step.
+ * Props:
+ *   forms: [{ code: 'P-RS1 001-01.02', file: '/forms/P-RS1-001-01.02.pdf' }, ...]
+ *   onOpen: (form) => void  — called when user clicks a form row
+ */
+export default function FormsPanel({ forms = [], onOpen }) {
+  return (
+    <div style={{
+      width: 210,
+      flexShrink: 0,
+      position: 'sticky',
+      top: 16,
+      alignSelf: 'flex-start',
+    }}>
+      <div style={{
+        border: '1px solid var(--border)',
+        borderRadius: 8,
+        overflow: 'hidden',
+        background: 'var(--surface)',
+        boxShadow: '0 1px 4px rgba(0,0,0,0.07)',
+      }}>
+        {/* Header */}
+        <div style={{
+          background: 'var(--blue)',
+          color: '#fff',
+          padding: '8px 12px',
+          fontSize: 12,
+          fontWeight: 700,
+          letterSpacing: '0.03em',
+          display: 'flex',
+          alignItems: 'center',
+          gap: 6,
+        }}>
+          📋 Biểu Mẫu
+        </div>
+
+        {/* Form list */}
+        <div style={{ padding: '6px 0' }}>
+          {forms.map((f) => (
+            <button
+              key={f.code}
+              onClick={() => onOpen(f)}
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: 8,
+                width: '100%',
+                padding: '7px 12px',
+                border: 'none',
+                background: 'transparent',
+                cursor: 'pointer',
+                textAlign: 'left',
+                borderBottom: '1px solid var(--border)',
+                transition: 'background 0.12s',
+              }}
+              onMouseEnter={e => e.currentTarget.style.background = 'var(--blue-xlight)'}
+              onMouseLeave={e => e.currentTarget.style.background = 'transparent'}
+            >
+              <span style={{ fontSize: 13, flexShrink: 0 }}>📄</span>
+              <div style={{ minWidth: 0 }}>
+                <div style={{ fontSize: 11.5, fontWeight: 600, color: 'var(--blue)', lineHeight: 1.3 }}>
+                  {f.code}
+                </div>
+                {f.label && (
+                  <div style={{ fontSize: 10.5, color: 'var(--muted)', marginTop: 1, lineHeight: 1.3, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                    {f.label}
+                  </div>
+                )}
+              </div>
+            </button>
+          ))}
+        </div>
+
+        {/* Footer hint */}
+        <div style={{ padding: '6px 12px 8px', fontSize: 10, color: 'var(--muted)', borderTop: '1px solid var(--border)' }}>
+          Click để xem · Kéo/In PDF trong cửa sổ xem
+        </div>
+      </div>
+    </div>
+  )
+}

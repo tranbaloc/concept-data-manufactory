@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { useLang } from '../../i18n/context'
 import {
   BarChart, Bar, LineChart, Line, XAxis, YAxis, CartesianGrid,
   Tooltip, Legend, ResponsiveContainer, AreaChart, Area
@@ -34,7 +35,46 @@ const products = [
   {name:'Trà sữa đóng chai',q1:9800,q2:11200,q3:10400,q4:12500,total:43900,yoy:'+24.3%'},
 ]
 
+const T = {
+  vi: {
+    title: '📈 Thống Kê Dữ Liệu Tổng Hợp',
+    subtitle: 'Upload file tổng hợp → AI phân tích theo tháng/năm, xu hướng 3 năm gần nhất, dự báo tương lai',
+    tabs: ['📊 Tổng quan năm', '📋 Bảng chi tiết', '📈 Xu hướng 3 năm', '🤖 Phân tích AI'],
+    thMonth: 'Tháng', thOrders: 'Đơn hàng', thRevenue: 'Doanh thu', thProd: 'Sản lượng SX', thError: 'Tỷ lệ lỗi', thVsPrev: 'So tháng trước',
+    kpi: ['Tổng đơn hàng (YTD)','Doanh thu (YTD)','Sản lượng SX (YTD)','Tỷ lệ lỗi TB'],
+    kpiSub: ['↑ 9.4% so cùng kỳ 2025','↑ 11.2% so cùng kỳ 2025','Hiệu suất trung bình: 87%','↓ 0.18% so 2025'],
+    outerTabs: ['📊 Tổng quan năm','📋 Bảng chi tiết','📈 Xu hướng 3 năm','🤖 Phân tích AI'],
+    thProduct: 'Sản phẩm',
+    thQ1: 'Q1',
+    thQ2: 'Q2',
+    thQ3: 'Q3',
+    thQ4: 'Q4',
+    thYear: 'Cả năm',
+    thYoY: 'YoY',
+    jsTabs: ['Tháng / Năm 2026','Xu hướng 3 năm','Theo sản phẩm','Tóm tắt AI'],
+  },
+  zh: {
+    title: '📈 综合数据统计',
+    subtitle: '上传汇总文件 → AI按月/年分析，近3年趋势，未来预测',
+    tabs: ['📊 年度总览', '📋 详细表格', '📈 3年趋势', '🤖 AI分析'],
+    thMonth: '月份', thOrders: '订单量', thRevenue: '营收', thProd: '产量', thError: '不良率', thVsPrev: '环比',
+    kpi: ['订单总量(YTD)','营收(YTD)','产量(YTD)','平均不良率'],
+    kpiSub: ['↑ 较2025同期9.4%','↑ 较2025同期11.2%','平均效率: 87%','↓ 较2025降0.18%'],
+    outerTabs: ['📊 年度总览','📋 详细表格','📈 3年趋势','🤖 AI分析'],
+    thProduct: '产品',
+    thQ1: 'Q1',
+    thQ2: 'Q2',
+    thQ3: 'Q3',
+    thQ4: 'Q4',
+    thYear: '全年',
+    thYoY: '同比',
+    jsTabs: ['2026月/年','3年趋势','按产品','AI摘要'],
+  },
+}
+
 export default function DataStatistics() {
+  const { lang } = useLang()
+  const tx = T[lang] || T.vi
   const [tab, setTab] = useState(0)
   const [file, setFile] = useState(null)
   const [analyzed, setAnalyzed] = useState(false)
@@ -54,7 +94,7 @@ export default function DataStatistics() {
   return (
     <div className="sg">
       <div className="ph">
-        <div><h1>📈 Thống Kê Dữ Liệu Tổng Hợp</h1><p>Upload file tổng hợp → AI phân tích theo tháng/năm, xu hướng 3 năm gần nhất, dự báo tương lai</p></div>
+        <div><h1>{tx.title}</h1><p>{tx.subtitle}</p></div>
       </div>
 
       <div className="card">
@@ -77,7 +117,7 @@ export default function DataStatistics() {
       </div>
 
       <div className="tabs">
-        {['Tháng / Năm 2026','Xu hướng 3 năm','Theo sản phẩm','Tóm tắt AI'].map((t,i)=>(
+        {tx.jsTabs.map((t,i)=>(
           <div key={i} className={`tab ${tab===i?'active':''}`} onClick={()=>setTab(i)}>{t}</div>
         ))}
       </div>
@@ -86,10 +126,10 @@ export default function DataStatistics() {
         <div className="sg">
           <div className="sg4">
             {[
-              {label:'Tổng đơn hàng (YTD)',val:'1,865',sub:'↑ 9.4% so cùng kỳ 2025',color:'#0078d4'},
-              {label:'Doanh thu (YTD)',val:'12.6 tỷ',sub:'↑ 11.2% so cùng kỳ 2025',color:'#107c10'},
-              {label:'Sản lượng SX (YTD)',val:'48,800 thùng',sub:'Hiệu suất trung bình: 87%',color:'#7c3aed'},
-              {label:'Tỷ lệ lỗi TB',val:'0.77%',sub:'↓ 0.18% so 2025',color:'#d97706'},
+              {label:tx.kpi[0],val:'1,865',sub:tx.kpiSub[0],color:'#0078d4'},
+              {label:tx.kpi[1],val:'12.6 tỷ',sub:tx.kpiSub[1],color:'#107c10'},
+              {label:tx.kpi[2],val:'48,800 thùng',sub:tx.kpiSub[2],color:'#7c3aed'},
+              {label:tx.kpi[3],val:'0.77%',sub:tx.kpiSub[3],color:'#d97706'},
             ].map((s,i)=><div className="sc" key={i}><div className="sc-label">{s.label}</div><div className="sc-value" style={{color:s.color}}>{s.val}</div><div className="sc-sub">{s.sub}</div></div>)}
           </div>
           <div className="g2">
@@ -114,7 +154,7 @@ export default function DataStatistics() {
             </div>
           </div>
           <div className="tw"><table>
-            <thead><tr><th>Tháng</th><th>Đơn hàng</th><th>Doanh thu</th><th>Sản lượng SX</th><th>Tỷ lệ lỗi</th><th>So tháng trước</th></tr></thead>
+            <thead><tr><th>{tx.thMonth}</th><th>{tx.thOrders}</th><th>{tx.thRevenue}</th><th>{tx.thProd}</th><th>{tx.thError}</th><th>{tx.thVsPrev}</th></tr></thead>
             <tbody>{monthly2026.map((m,i)=>(
               <tr key={i}>
                 <td className="fw5">{m.month}</td>
@@ -155,7 +195,7 @@ export default function DataStatistics() {
           <div className="card">
             <div className="card-title"><span className="card-title-left">🏷️ Sản lượng theo sản phẩm (2025 – full year)</span></div>
             <div className="tw"><table>
-              <thead><tr><th>Sản phẩm</th><th>Q1</th><th>Q2</th><th>Q3</th><th>Q4</th><th>Cả năm</th><th>YoY</th></tr></thead>
+              <thead><tr><th>{tx.thProduct}</th><th>{tx.thQ1}</th><th>{tx.thQ2}</th><th>{tx.thQ3}</th><th>{tx.thQ4}</th><th>{tx.thYear}</th><th>{tx.thYoY}</th></tr></thead>
               <tbody>{products.map((p,i)=>(
                 <tr key={i}>
                   <td className="fw5">{p.name}</td>

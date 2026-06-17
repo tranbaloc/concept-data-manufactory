@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { useLang } from '../../i18n/context'
 
 const mockResult = {
   name: 'GIAVICO-NC-VN-2026-A3',
@@ -18,7 +19,30 @@ const mockResult = {
   risks: ['Acid citric > 0.30% có thể ảnh hưởng ổn định màu','Kiểm tra tương tác Vitamin C – Natri benzoate trước khi scale lên'],
 }
 
+const T = {
+  vi: {
+    title: '🧪 Tạo Formula Theo Mục Tiêu',
+    subtitle: 'Nhập điều kiện đầu vào, AI sẽ đề xuất công thức phù hợp và giải thích lý do điều chỉnh',
+    inputCard: '⚙️ Điều kiện đầu vào',
+    historyCard: '📋 Lịch sử công thức tương tự',
+    generateBtn: '🤖 Tạo Formula AI',
+    thCode: 'Mã công thức', thMarket: 'Thị trường', thBrix: 'Brix', thDate: 'Ngày tạo',
+    thIngredient: 'Nguyên liệu', thPercent: '% w/w', thRole: 'Vai trò',
+  },
+  zh: {
+    title: '🧪 AI配方生成',
+    subtitle: '输入条件，AI将推荐合适的配方并解释调整原因',
+    inputCard: '⚙️ 输入条件',
+    historyCard: '📋 相似配方历史',
+    generateBtn: '🤖 生成AI配方',
+    thCode: '配方编号', thMarket: '市场', thBrix: 'Brix', thDate: '创建日期',
+    thIngredient: '原料', thPercent: '% w/w', thRole: '作用',
+  },
+}
+
 export default function FormulaGenerator() {
+  const { lang } = useLang()
+  const tx = T[lang] || T.vi
   const [form, setForm] = useState({market:'vn',brix:'12.5',acid:'yes',reg:'FDA',region:'HCM',flavor:'cam'})
   const [result, setResult] = useState(null)
   const [loading, setLoading] = useState(false)
@@ -31,12 +55,12 @@ export default function FormulaGenerator() {
   return (
     <div className="sg">
       <div className="ph">
-        <div><h1>🧪 Tạo Formula Theo Mục Tiêu</h1><p>Nhập điều kiện đầu vào, AI sẽ đề xuất công thức phù hợp và giải thích lý do điều chỉnh</p></div>
+        <div><h1>{tx.title}</h1><p>{tx.subtitle}</p></div>
       </div>
 
       <div className="g2">
         <div className="card">
-          <div className="card-title"><span className="card-title-left">⚙️ Điều kiện đầu vào</span></div>
+          <div className="card-title"><span className="card-title-left">{tx.inputCard}</span></div>
           <div className="sg" style={{gap:12}}>
             <div className="fg3">
               <div className="fr"><label>Thị trường</label>
@@ -81,10 +105,10 @@ export default function FormulaGenerator() {
         </div>
 
         <div className="card">
-          <div className="card-title"><span className="card-title-left">📋 Lịch sử công thức tương tự</span></div>
+          <div className="card-title"><span className="card-title-left">{tx.historyCard}</span></div>
           <div className="tw">
             <table>
-              <thead><tr><th>Mã công thức</th><th>Thị trường</th><th>Brix</th><th>Ngày tạo</th></tr></thead>
+              <thead><tr><th>{tx.thCode}</th><th>{tx.thMarket}</th><th>{tx.thBrix}</th><th>{tx.thDate}</th></tr></thead>
               <tbody>
                 {[['GV-NC-VN-2025-A1','VN','11.8','12/03/2025'],['GV-NC-US-2025-B2','US','12.0','05/05/2025'],
                   ['GV-NC-EU-2026-A1','EU','12.5','10/01/2026'],['GV-NC-VN-2026-A2','VN','12.5','15/03/2026']
@@ -113,7 +137,7 @@ export default function FormulaGenerator() {
               <div className="fw6 mb8">Thành phần công thức</div>
               <div className="tw">
                 <table>
-                  <thead><tr><th>Nguyên liệu</th><th>% w/w</th><th>Vai trò</th></tr></thead>
+                  <thead><tr><th>{tx.thIngredient}</th><th>{tx.thPercent}</th><th>{tx.thRole}</th></tr></thead>
                   <tbody>{result.ingredients.map((r,i)=>(
                     <tr key={i}><td className="fw5">{r.name}</td><td>{r.pct}%</td><td className="cm">{r.role}</td></tr>
                   ))}</tbody>

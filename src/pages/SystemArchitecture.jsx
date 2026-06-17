@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { useLang } from '../i18n/context'
 import {
   ReactFlow, Background, Controls, MiniMap, Panel,
   Handle, Position, useNodesState, useEdgesState,
@@ -106,7 +107,7 @@ function AIGroupNode({ data }) {
         <div style={{ flex:1 }}>
           <div style={{ fontSize:12, fontWeight:700, color:'#fff' }}>{data.title}</div>
           <div style={{ fontSize:10, color:'rgba(255,255,255,.7)', marginTop:1 }}>
-            {data.fns.length} AI functions · click to open</div>
+            {data.fns.length} AI functions · {tx.clickHint}</div>
         </div>
       </div>
       <div style={{ padding:'6px 8px' }}>
@@ -428,7 +429,34 @@ function build() {
 const { nodes:N0, edges:E0 } = build()
 
 /* ─── COMPONENT ──────────────────────────────────────────────────────────── */
+const T = {
+  vi: {
+    title: '🗺️ Kiến trúc hệ thống & Luồng dữ liệu AI',
+    subtitle: 'Luồng dữ liệu từ nguồn → pipeline → AI xử lý → ứng dụng. Scroll để zoom, drag để di chuyển. Click node để mở module.',
+    legend: [['#16a34a','Nguồn dữ liệu'],['#ea580c','Data Pipeline'],['#2563eb','AI tĩnh'],['#7c3aed','AI Realtime'],['#0d9488','Data Warehouse'],['#4f46e5','Ứng dụng']],
+    legendHint: '🖱 Scroll = zoom · Drag = pan · Click node = mở trang',
+    panelTitle: 'GIAVICO AI Platform',
+    panelLine1: '4 nguồn dữ liệu  →  5 bước pipeline',
+    panelLine2: '3 nhóm AI  →  19 module ứng dụng',
+    panelVersion: 'Phiên bản 2026 R1',
+    clickHint: 'click to open',
+  },
+  zh: {
+    title: '🗺️ 系统架构与AI数据流',
+    subtitle: '数据流：数据源 → Pipeline → AI处理 → 应用。滚轮缩放，拖拽平移，点击节点打开模块。',
+    legend: [['#16a34a','数据源'],['#ea580c','数据Pipeline'],['#2563eb','静态AI'],['#7c3aed','实时AI'],['#0d9488','数据仓库'],['#4f46e5','应用']],
+    legendHint: '🖱 滚轮 = 缩放 · 拖拽 = 平移 · 点击节点 = 打开页面',
+    panelTitle: 'GIAVICO AI 平台',
+    panelLine1: '4个数据源  →  5步Pipeline',
+    panelLine2: '3个AI模块  →  19个应用模块',
+    panelVersion: '2026年 R1版本',
+    clickHint: '点击打开',
+  },
+}
+
 export default function SystemArchitecture() {
+  const { lang } = useLang()
+  const tx = T[lang] || T.vi
   const [nodes,,onNodesChange] = useNodesState(N0)
   const [edges,,onEdgesChange] = useEdgesState(E0)
 
@@ -436,24 +464,22 @@ export default function SystemArchitecture() {
     <div className="sg">
       <div className="ph">
         <div>
-          <h1>🗺️ Kiến trúc hệ thống & Luồng dữ liệu AI</h1>
-          <p>Luồng dữ liệu từ nguồn → pipeline → AI xử lý → ứng dụng. Scroll để zoom, drag để di chuyển. Click node để mở module.</p>
+          <h1>{tx.title}</h1>
+          <p>{tx.subtitle}</p>
         </div>
       </div>
 
       <div style={{ display:'flex', gap:16, flexWrap:'wrap', padding:'8px 14px',
         background:'#f8faff', borderRadius:8, fontSize:11.5, color:'#475569',
         alignItems:'center' }}>
-        {[['#16a34a','Nguồn dữ liệu'],['#ea580c','Data Pipeline'],
-          ['#2563eb','AI tĩnh'],['#7c3aed','AI Realtime'],
-          ['#0d9488','Data Warehouse'],['#4f46e5','Ứng dụng']].map(([c,l])=>(
+        {tx.legend.map(([c,l])=>(
           <div key={l} style={{ display:'flex', alignItems:'center', gap:5 }}>
             <div style={{ width:10, height:10, borderRadius:3, background:c }}/>
             <span>{l}</span>
           </div>
         ))}
         <span style={{ marginLeft:'auto', opacity:.6, fontSize:11 }}>
-          🖱 Scroll = zoom · Drag = pan · Click node = mở trang
+          {tx.legendHint}
         </span>
       </div>
 
@@ -488,12 +514,12 @@ export default function SystemArchitecture() {
               fontSize:11, color:'#64748b', lineHeight:1.7,
               boxShadow:'0 2px 16px rgba(0,0,0,.08)' }}>
               <div style={{ fontWeight:700, color:'#1e293b', marginBottom:2, fontSize:12 }}>
-                GIAVICO AI Platform
+                {tx.panelTitle}
               </div>
-              <div>4 nguồn dữ liệu  →  5 bước pipeline</div>
-              <div>3 nhóm AI  →  19 module ứng dụng</div>
+              <div>{tx.panelLine1}</div>
+              <div>{tx.panelLine2}</div>
               <div style={{ marginTop:4, paddingTop:4, borderTop:'1px solid #f1f5f9', color:'#94a3b8' }}>
-                Phiên bản 2026 R1
+                {tx.panelVersion}
               </div>
             </div>
           </Panel>

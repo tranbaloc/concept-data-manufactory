@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { useLang } from '../../i18n/context'
 
 const initRows = [
   {name:'Nước tinh khiết',pct:62.40,unit:'kg',base:312.0,scaled:'',risk:false},
@@ -11,7 +12,52 @@ const initRows = [
   {name:'Màu β-caroten',pct:0.01,unit:'g',base:50,scaled:'',risk:false},
 ]
 
+const T = {
+  vi: {
+    title: '📐 Tính Toán Batch & Quy Đổi',
+    subtitle: 'Tự động scale công thức theo kích thước batch, cảnh báo tham số có rủi ro',
+    paramsCard: '🔢 Thông số tính toán',
+    statsCard: '📊 Thông số batch',
+    detailCard: '📋 Chi tiết thành phần',
+    lConvert: 'Hệ số quy đổi',
+    lTotal: 'Tổng khối lượng',
+    lYield: 'Năng suất dự kiến',
+    lColor: 'Độ đồng nhất màu sắc',
+    lPH: 'Ổn định pH',
+    lCO2: 'Độ bão hòa CO₂',
+    lTol: 'Kiểm soát dung sai',
+    thIng: 'Nguyên liệu',
+    thWw: '% w/w',
+    thBase: 'Batch gốc',
+    thTarget: 'Batch mục tiêu',
+    thUnit: 'Đơn vị',
+    thRisk: 'Rủi ro',
+  },
+  zh: {
+    title: '📐 批量计算与换算',
+    subtitle: '根据批量大小自动缩放配方，警告有风险的参数',
+    paramsCard: '🔢 计算参数',
+    statsCard: '📊 批量参数',
+    detailCard: '📋 成分详情',
+    lConvert: '换算系数',
+    lTotal: '总质量',
+    lYield: '预计产量',
+    lColor: '颜色均匀性',
+    lPH: 'pH稳定性',
+    lCO2: 'CO₂饱和度',
+    lTol: '公差控制',
+    thIng: '原料',
+    thWw: '% w/w',
+    thBase: '基础批量',
+    thTarget: '目标批量',
+    thUnit: '单位',
+    thRisk: '风险',
+  },
+}
+
 export default function BatchCalculation() {
+  const { lang } = useLang()
+  const tx = T[lang] || T.vi
   const [baseSize, setBaseSize] = useState(500)
   const [targetSize, setTargetSize] = useState(500)
   const [variance, setVariance] = useState(2)
@@ -30,12 +76,12 @@ export default function BatchCalculation() {
   return (
     <div className="sg">
       <div className="ph">
-        <div><h1>📐 Tính Toán Batch & Quy Đổi</h1><p>Tự động scale công thức theo kích thước batch, cảnh báo tham số có rủi ro</p></div>
+        <div><h1>{tx.title}</h1><p>{tx.subtitle}</p></div>
       </div>
 
       <div className="g2">
         <div className="card">
-          <div className="card-title"><span className="card-title-left">🔢 Thông số tính toán</span></div>
+          <div className="card-title"><span className="card-title-left">{tx.paramsCard}</span></div>
           <div className="fg2">
             <div className="fr"><label>Batch gốc (kg)</label>
               <input type="number" value={baseSize} onChange={e=>setBaseSize(+e.target.value)} />
@@ -68,12 +114,12 @@ export default function BatchCalculation() {
         </div>
 
         <div className="card">
-          <div className="card-title"><span className="card-title-left">📊 Thông số batch</span></div>
+          <div className="card-title"><span className="card-title-left">{tx.statsCard}</span></div>
           <div className="sg3">
             {[
-              {label:'Hệ số quy đổi',val:`${(targetSize/baseSize).toFixed(2)}x`},
-              {label:'Tổng khối lượng',val:`${targetSize} kg`},
-              {label:'Năng suất dự kiến',val:`${Math.round(targetSize/0.345)} chai`},
+              {label:tx.lConvert,val:`${(targetSize/baseSize).toFixed(2)}x`},
+              {label:tx.lTotal,val:`${targetSize} kg`},
+              {label:tx.lYield,val:`${Math.round(targetSize/0.345)} chai`},
             ].map((s,i)=>(
               <div className="sc" key={i}>
                 <div className="sc-label">{s.label}</div>
@@ -84,10 +130,10 @@ export default function BatchCalculation() {
           <div className="divider"/>
           <div className="fw6 mb8">Kiểm tra ổn định batch</div>
           {[
-            {label:'Độ đồng nhất màu sắc',val:97,color:'#107c10'},
-            {label:'Ổn định pH',val:94,color:'#0078d4'},
-            {label:'Độ bão hòa CO₂',val:88,color:'#d97706'},
-            {label:'Kiểm soát dung sai',val:99,color:'#107c10'},
+            {label:tx.lColor,val:97,color:'#107c10'},
+            {label:tx.lPH,val:94,color:'#0078d4'},
+            {label:tx.lCO2,val:88,color:'#d97706'},
+            {label:tx.lTol,val:99,color:'#107c10'},
           ].map((m,i)=>(
             <div className="meter-row" key={i}>
               <div className="meter-label tsm">{m.label}</div>
@@ -99,7 +145,7 @@ export default function BatchCalculation() {
       </div>
 
       <div className="card">
-        <div className="card-title"><span className="card-title-left">📋 Chi tiết thành phần</span></div>
+        <div className="card-title"><span className="card-title-left">{tx.detailCard}</span></div>
         <div className="tw">
           <table>
             <thead><tr><th>Nguyên liệu</th><th>% w/w</th><th>Batch gốc ({baseSize}kg)</th><th>Batch mục tiêu ({targetSize}kg)</th><th>Đơn vị</th><th>Rủi ro</th></tr></thead>

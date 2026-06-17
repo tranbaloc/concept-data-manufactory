@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { useLang } from '../../i18n/context'
 
 const mockEmails = [
   {
@@ -145,7 +146,34 @@ function StepBar({ active }) {
   )
 }
 
+const T = {
+  vi: {
+    title: '📧 Bước 1 – Nhận & Phân Tích Email Đơn Hàng',
+    subtitle: 'AI tự động đọc email, trích xuất thông tin đơn hàng và chuẩn bị dữ liệu cho bước tiếp theo',
+    statusNew: 'Mới', statusProcessing: 'Đang xử lý', statusRD: 'Chờ R&D', statusDone: 'Hoàn tất',
+    all: 'Tất cả',
+    extract: '🤖 Trích Xuất AI',
+    next: '→ Bước 2: Tổng Hợp',
+    reply: '↩ Trả Lời Email',
+    extracted: '✅ Thông tin đã trích xuất',
+    aiAnalysis: '🤖 Phân tích AI',
+  },
+  zh: {
+    title: '📧 步骤1 – 接收与分析订单邮件',
+    subtitle: 'AI自动读取邮件，提取订单信息并准备下一步数据',
+    statusNew: '新', statusProcessing: '处理中', statusRD: '等待R&D', statusDone: '完成',
+    all: '全部',
+    extract: '🤖 AI 提取',
+    next: '→ 步骤2：汇总',
+    reply: '↩ 回复邮件',
+    extracted: '✅ 已提取信息',
+    aiAnalysis: '🤖 AI分析',
+  },
+}
+
 export default function EmailInbox() {
+  const { lang } = useLang()
+  const tx = T[lang] || T.vi
   const navigate = useNavigate()
   const [selected, setSelected] = useState(mockEmails[0])
   const [parsing, setParsing] = useState(false)

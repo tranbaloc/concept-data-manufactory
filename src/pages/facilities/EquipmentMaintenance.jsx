@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { useLang } from '../../i18n/context'
 import { LineChart, Line, BarChart, Bar, XAxis, YAxis, Tooltip,
          ResponsiveContainer, ReferenceLine, Cell } from 'recharts'
 
@@ -81,7 +82,58 @@ const tempData = Array.from({length:12},(_,i)=>({
 
 const healthColor = h => h>=90?'#107c10':h>=70?'#d97706':'#d13438'
 
+const T = {
+  vi: {
+    title: '🔧 Bảo Trì & Quản Lý Thiết Bị',
+    subtitle: 'Predictive Maintenance – AI phân tích cảm biến, phát hiện bất thường, dự báo tuổi thọ',
+    tabs: ['📊 Cảm biến thực tế', '📋 Lịch bảo trì'],
+    kpi: ['Thiết bị hoạt động','Cảnh báo bất thường','Nguy hiểm cao','Uptime trung bình'],
+    kpiSub: ['2 đang bảo trì','Cần xem xét ngay','MX-04 vượt ngưỡng','Mục tiêu >= 98%'],
+    deviceTabs: ['Lịch sử sửa chữa','Công việc sắp tới','Thông số cảm biến'],
+    outerTabs: ['Danh sách thiết bị','Biểu đồ nhiệt độ','Lịch bảo trì'],
+    lHealth: 'Sức khỏe',
+    lUptime: 'Uptime',
+    lMTTR: 'MTTR',
+    lMTBF: 'MTBF',
+    lTemp: 'Nhiệt độ',
+    lVib: 'Độ rung',
+    lCurrent: 'Dòng điện',
+    thName: 'Tên thiết bị',
+    thType: 'Loại',
+    thStatus: 'Trạng thái',
+    thHealth: 'Sức khỏe',
+    thUptime: 'Uptime',
+    thAlert: 'Cảnh báo',
+    thNext: 'Bảo trì tiếp',
+  },
+  zh: {
+    title: '🔧 设备维护与管理',
+    subtitle: '预测性维护 – AI分析传感器，检测异常，预测使用寿命',
+    tabs: ['📊 实时传感器', '📋 维护计划'],
+    kpi: ['设备运行中','异常警报','高危险','平均在线率'],
+    kpiSub: ['2台维护中','需立即查看','MX-04超阈值','目标 >= 98%'],
+    deviceTabs: ['维修历史','待办任务','传感器数据'],
+    outerTabs: ['设备列表','温度图表','维护计划'],
+    lHealth: '健康度',
+    lUptime: '在线率',
+    lMTTR: 'MTTR',
+    lMTBF: 'MTBF',
+    lTemp: '温度',
+    lVib: '振动',
+    lCurrent: '电流',
+    thName: '设备名称',
+    thType: '类型',
+    thStatus: '状态',
+    thHealth: '健康度',
+    thUptime: '在线率',
+    thAlert: '告警',
+    thNext: '下次维护',
+  },
+}
+
 export default function EquipmentMaintenance() {
+  const { lang } = useLang()
+  const tx = T[lang] || T.vi
   const [selected, setSelected] = useState(null)
   const [tab, setTab] = useState(0)
   const [viewTab, setViewTab] = useState(0)
@@ -90,7 +142,7 @@ export default function EquipmentMaintenance() {
   return (
     <div className="sg">
       <div className="ph">
-        <div><h1>🔧 Bảo Trì & Quản Lý Thiết Bị</h1><p>Predictive Maintenance – AI phân tích cảm biến, phát hiện bất thường, dự báo tuổi thọ</p></div>
+        <div><h1>{tx.title}</h1><p>{tx.subtitle}</p></div>
         <div className="fl g8">
           <button className="btn btn-primary btn-sm">+ Tạo phiếu bảo trì</button>
           <button className="btn btn-outline btn-sm">📊 Báo cáo định kỳ</button>
@@ -98,10 +150,10 @@ export default function EquipmentMaintenance() {
       </div>
       <div className="sg4">
         {[
-          {label:'Thiết bị hoạt động',val:'18/20',sub:'2 đang bảo trì',color:'#107c10'},
-          {label:'Cảnh báo bất thường',val:'3',sub:'Cần xem xét ngay',color:'#d97706'},
-          {label:'Nguy hiểm cao',val:'1',sub:'MX-04 vượt ngưỡng',color:'#d13438'},
-          {label:'Uptime trung bình',val:'96.3%',sub:'Mục tiêu >= 98%',color:'#0078d4'},
+          {label:tx.kpi[0],val:'18/20',sub:tx.kpiSub[0],color:'#107c10'},
+          {label:tx.kpi[1],val:'3',sub:tx.kpiSub[1],color:'#d97706'},
+          {label:tx.kpi[2],val:'1',sub:tx.kpiSub[2],color:'#d13438'},
+          {label:tx.kpi[3],val:'96.3%',sub:tx.kpiSub[3],color:'#0078d4'},
         ].map((s,i)=>(
           <div className="sc" key={i}>
             <div className="sc-label">{s.label}</div>
@@ -133,10 +185,10 @@ export default function EquipmentMaintenance() {
           </div>
           <div style={{display:'grid',gridTemplateColumns:'repeat(5,1fr)',gap:10,marginBottom:16}}>
             {[
-              {label:'Sức khỏe',val:`${device.health}%`,color:healthColor(device.health)},
-              {label:'Uptime',val:`${device.uptime}%`,color:'#0078d4'},
-              {label:'MTTR',val:`${device.mttr}h`,color:'#d97706'},
-              {label:'MTBF',val:`${device.mtbf}h`,color:'#107c10'},
+              {label:tx.lHealth,val:`${device.health}%`,color:healthColor(device.health)},
+              {label:tx.lUptime,val:`${device.uptime}%`,color:'#0078d4'},
+              {label:tx.lMTTR,val:`${device.mttr}h`,color:'#d97706'},
+              {label:tx.lMTBF,val:`${device.mtbf}h`,color:'#107c10'},
               {label:'Nhiệt độ',val:`${device.temp}°C`,color:device.temp>75?'#d13438':device.temp>65?'#d97706':'#107c10'},
             ].map((k,i)=>(
               <div key={i} style={{textAlign:'center',background:'var(--bg)',borderRadius:8,padding:'10px 8px',border:'1px solid var(--border)'}}>
@@ -153,7 +205,7 @@ export default function EquipmentMaintenance() {
             <span className="fw6" style={{color:healthColor(device.health)}}>{device.health}%</span>
           </div>
           <div className="tabs" style={{marginBottom:12}}>
-            {['Lịch sử sửa chữa','Công việc sắp tới','Thông số cảm biến'].map((t,i)=>(
+            {tx.deviceTabs.map((t,i)=>(
               <div key={i} className={`tab ${viewTab===i?'active':''}`} onClick={()=>setViewTab(i)} style={{fontSize:12}}>{t}</div>
             ))}
           </div>
@@ -208,7 +260,7 @@ export default function EquipmentMaintenance() {
         </div>
       )}
       <div className="tabs">
-        {['Danh sách thiết bị','Biểu đồ nhiệt độ','Lịch bảo trì'].map((t,i)=>(
+        {tx.outerTabs.map((t,i)=>(
           <div key={i} className={`tab ${tab===i?'active':''}`} onClick={()=>setTab(i)}>{t}</div>
         ))}
       </div>

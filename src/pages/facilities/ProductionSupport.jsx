@@ -1,12 +1,27 @@
+
+const T = {
+  vi: {
+    title: '⚙️ Hỗ Trợ Sản Xuất',
+    subtitle: 'Tối ưu lịch máy, điều phối AGV, kiểm tra chất lượng bằng camera AI',
+    kpi: ['Máy đang hoạt động','AGV đang vận hành','Lỗi phát hiện bởi AI hôm nay'],
+  },
+  zh: {
+    title: '⚙️ 生产支持',
+    subtitle: '优化机器排程，调度AGV，AI摄像头质量检测',
+    kpi: ['运行中的机器','运行中的AGV','今日AI检测缺陷'],
+  },
+}
 export default function ProductionSupport() {
+  const { lang } = useLang()
+  const tx = T[lang] || T.vi
   return (
     <div className="sg">
-      <div className="ph"><div><h1>⚙️ Hỗ Trợ Sản Xuất</h1><p>Tối ưu lịch máy, điều phối AGV, kiểm tra chất lượng bằng camera AI</p></div></div>
+      <div className="ph"><div><h1>{tx.title}</h1><p>{tx.subtitle}</p></div></div>
       <div className="sg3">
         {[
-          {label:'Máy đang hoạt động',val:'8/10',color:'#107c10'},
-          {label:'AGV đang vận hành',val:'4/5',color:'#0078d4'},
-          {label:'Lỗi phát hiện bởi AI hôm nay',val:'12',color:'#d97706'},
+          {label:tx.kpi[0],val:'8/10',color:'#107c10'},
+          {label:tx.kpi[1],val:'4/5',color:'#0078d4'},
+          {label:tx.kpi[2],val:'12',color:'#d97706'},
         ].map((s,i)=><div className="sc" key={i}><div className="sc-label">{s.label}</div><div className="sc-value" style={{color:s.color}}>{s.val}</div></div>)}
       </div>
       <div className="g2">

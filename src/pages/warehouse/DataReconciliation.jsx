@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { useLang } from '../../i18n/context'
 const diffRows = [
   {item:'NC Cam 330ml','file1':12400,'file2':12350,diff:-50,status:'Lệch'},
   {item:'NC Chanh 500ml','file1':8200,'file2':8200,diff:0,status:'Khớp'},
@@ -9,19 +10,38 @@ const diffRows = [
   {item:'Nhãn NC Cam','file1':45200,'file2':45220,diff:20,status:'Lệch'},
   {item:'Sucrose 25kg/bao','file1':320,'file2':320,diff:0,status:'Khớp'},
 ]
+const T = {
+  vi: {
+    title: '🔍 Đối Chiếu Dữ Liệu Excel',
+    subtitle: 'AI so sánh 2 file Excel, phát hiện chênh lệch – Tiết kiệm thời gian đối soát cuối tháng',
+    compareCard: '📊 Kết quả so sánh',
+    thItem: 'Mặt hàng / Vật tư', thFile1: 'File 1', thFile2: 'File 2', thDiff: 'Chênh lệch', thResult: 'Kết quả',
+    kpi: ['Mục khớp hoàn toàn','Mục có chênh lệch','Tổng hàng kiểm tra'],
+  },
+  zh: {
+    title: '🔍 Excel数据对账',
+    subtitle: 'AI比较2个Excel文件，发现差异 – 节省月末对账时间',
+    compareCard: '📊 对比结果',
+    thItem: '商品/物料', thFile1: '文件1', thFile2: '文件2', thDiff: '差异', thResult: '结果',
+    kpi: ['完全匹配项','有差异项','总检查行数'],
+  },
+}
+
 export default function DataReconciliation() {
+  const { lang } = useLang()
+  const tx = T[lang] || T.vi
   const [uploaded, setUploaded] = useState(false)
   const [compared, setCompared] = useState(false)
   const diffs = diffRows.filter(r=>r.status==='Lệch')
 
   return (
     <div className="sg">
-      <div className="ph"><div><h1>🔍 Đối Chiếu Dữ Liệu Excel</h1><p>AI so sánh 2 file Excel, phát hiện chênh lệch – Tiết kiệm thời gian đối soát cuối tháng</p></div></div>
+      <div className="ph"><div><h1>{tx.title}</h1><p>{tx.subtitle}</p></div></div>
       <div className="sg3">
         {[
-          {label:'Mục khớp hoàn toàn',val:'4',color:'#107c10'},
-          {label:'Mục có chênh lệch',val:'4',color:'#d13438'},
-          {label:'Tổng hàng kiểm tra',val:'8',color:'#0078d4'},
+          {label:tx.kpi[0],val:'4',color:'#107c10'},
+          {label:tx.kpi[1],val:'4',color:'#d13438'},
+          {label:tx.kpi[2],val:'8',color:'#0078d4'},
         ].map((s,i)=><div className="sc" key={i}><div className="sc-label">{s.label}</div><div className="sc-value" style={{color:s.color}}>{s.val}</div></div>)}
       </div>
       {!compared ? (
@@ -54,7 +74,7 @@ export default function DataReconciliation() {
               <div className="fl g8"><button className="btn btn-outline btn-sm">📥 Xuất báo cáo</button><button className="btn btn-ghost btn-sm" onClick={()=>setCompared(false)}>🔄 So sánh lại</button></div>
             </div>
             <div className="tw"><table>
-              <thead><tr><th>Mặt hàng / Vật tư</th><th>File 1</th><th>File 2</th><th>Chênh lệch</th><th>Kết quả</th></tr></thead>
+              <thead><tr><th>{tx.thItem}</th><th>{tx.thFile1}</th><th>{tx.thFile2}</th><th>{tx.thDiff}</th><th>{tx.thResult}</th></tr></thead>
               <tbody>{diffRows.map((r,i)=>(
                 <tr key={i}>
                   <td className="fw5">{r.item}</td>

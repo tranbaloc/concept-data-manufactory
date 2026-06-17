@@ -1,4 +1,5 @@
 import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, ReferenceLine } from 'recharts'
+import { useLang } from '../../i18n/context'
 const packaging = [
   {code:'PM-PET-330',name:'Bao bì PET 330ml',avgUse:8500,stock:45000,daysLeft:5.3,low:false},
   {code:'PM-PET-500',name:'Bao bì PET 500ml',avgUse:6200,stock:18600,daysLeft:3.0,low:true},
@@ -12,7 +13,26 @@ const trend = [
   {day:'T4',PET330:8900,PET500:6100},{day:'T5',PET330:8400,PET500:6500},
   {day:'T6',PET330:8700,PET500:6200},
 ]
+const T = {
+  vi: {
+    title: '🏷️ Theo Dõi & Dự Báo Bao Bì',
+    subtitle: 'Phân loại tiêu chuẩn sử dụng, cảnh báo sắp hết, đề xuất đặt mua tự động',
+    thCode: 'Mã', thName: 'Tên bao bì', thStock: 'Tồn kho', thAvgDay: 'TB dùng/ngày',
+    thForecast: 'Dự báo hết', thStatus: 'Trạng thái', thAction: 'Hành động',
+    kpi: ['Loại bao bì theo dõi','Cảnh báo sắp hết (<4 ngày)','Cần đặt mua ngay','Trung bình ngày sử dụng'],
+  },
+  zh: {
+    title: '🏷️ 包装跟踪与预测',
+    subtitle: '标准用量分类，库存预警，自动采购建议',
+    thCode: '编号', thName: '包装名称', thStock: '库存', thAvgDay: '日均用量',
+    thForecast: '预计耗尽', thStatus: '状态', thAction: '操作',
+    kpi: ['跟踪包装类型','即将耗尽警告(<4天)','需立即订购','平均使用天数'],
+  },
+}
+
 export default function PackagingTracking() {
+  const { lang } = useLang()
+  const tx = T[lang] || T.vi
   return (
     <div className="sg">
       <div className="ph">
@@ -21,17 +41,17 @@ export default function PackagingTracking() {
       </div>
       <div className="sg4">
         {[
-          {label:'Loại bao bì theo dõi',val:'6',color:'#0078d4'},
-          {label:'Cảnh báo sắp hết (<4 ngày)',val:'2',color:'#d13438'},
-          {label:'Cần đặt mua ngay',val:'2',color:'#d97706'},
-          {label:'Trung bình ngày sử dụng',val:'5.5 ngày',color:'#107c10'},
+          {label:tx.kpi[0],val:'6',color:'#0078d4'},
+          {label:tx.kpi[1],val:'2',color:'#d13438'},
+          {label:tx.kpi[2],val:'2',color:'#d97706'},
+          {label:tx.kpi[3],val:'5.5 ngày',color:'#107c10'},
         ].map((s,i)=><div className="sc" key={i}><div className="sc-label">{s.label}</div><div className="sc-value" style={{color:s.color}}>{s.val}</div></div>)}
       </div>
       <div className="al al-red">🔴 <strong>Khẩn:</strong> PET 500ml còn 3 ngày sử dụng và Nhãn NC Cam còn 3 ngày. Cần liên hệ nhà cung cấp ngay hôm nay để đảm bảo giao hàng kịp thứ 4.</div>
       <div className="card">
         <div className="card-title"><span className="card-title-left">📊 Tình trạng bao bì theo kế hoạch sản xuất</span></div>
         <div className="tw"><table>
-          <thead><tr><th>Mã</th><th>Tên bao bì</th><th>Tồn kho</th><th>TB dùng/ngày</th><th>Dự báo hết</th><th>Trạng thái</th><th>Hành động</th></tr></thead>
+          <thead><tr><th>{tx.thCode}</th><th>{tx.thName}</th><th>{tx.thStock}</th><th>{tx.thAvgDay}</th><th>{tx.thForecast}</th><th>{tx.thStatus}</th><th>{tx.thAction}</th></tr></thead>
           <tbody>{packaging.map((p,i)=>(
             <tr key={i}>
               <td className="fw5 tb tsm">{p.code}</td>

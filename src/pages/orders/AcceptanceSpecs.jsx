@@ -3,6 +3,7 @@ import PDFDrawer from '../../components/PDFDrawer'
 import FormsBanner from '../../components/FormsBanner'
 import FormsPanel from '../../components/FormsPanel'
 import { useNavigate } from 'react-router-dom'
+import { useLang } from '../../i18n/context'
 
 
 function StepBar({ active }) {
@@ -37,7 +38,20 @@ const FORMS = [
     {code:'P-RS1 003-10.01', label:'Ký Nhận BTP', file:'/forms/P-RS1-003-10.01.pdf'},
     {code:'P-RS1 002-04.01', label:'Ký Nhận QC SP', file:'/forms/P-RS1-002-04.01.pdf'}
   ]
+const T = {
+  vi: {
+    title: '✅ Bước 5 – Bảng Quy Cách Nghiệm Thu',
+    subtitle: 'Biểu mẫu P-RS1 001-02.02 · 003-09.03 · 003-03.02 – Quy cách TP/BTP/NL & kiểm tra chất lượng',
+  },
+  zh: {
+    title: '✅ 步骤5 – 验收规格表',
+    subtitle: '表单 P-RS1 001-02.02 · 003-09.03 · 003-03.02 – 成品/半成品/原料规格与质量检验',
+  },
+}
+
 export default function AcceptanceSpecs() {
+  const { lang } = useLang()
+  const tx = T[lang] || T.vi
   const navigate = useNavigate()
   const [pdf, setPdf] = useState(null)
   const [tab, setTab] = useState('finished')
@@ -52,7 +66,7 @@ export default function AcceptanceSpecs() {
       <div className="sg" style={{flex:1}}>
       <div className="ph">
         <div>
-          <h1>✅ Bước 5 – Bảng Quy Cách Nghiệm Thu</h1>
+          <h1>{tx.title}</h1>
           <p>P-RS1 001-02.02 (Thành Phẩm) · P-RS1 003-09.03 (Bán Thành Phẩm) · P-RS1 003-03.02 (Nguyên Liệu)</p>
         </div>
         <div className="fl ic g8">

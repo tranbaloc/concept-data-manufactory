@@ -3,6 +3,7 @@ import PDFDrawer from '../../components/PDFDrawer'
 import FormsBanner from '../../components/FormsBanner'
 import FormsPanel from '../../components/FormsPanel'
 import { useNavigate } from 'react-router-dom'
+import { useLang } from '../../i18n/context'
 
 
 function StepBar({ active }) {
@@ -35,7 +36,20 @@ const FORMS = [
     {code:'P-RS1 001-03.02', label:'Quy Cách SP Mới', file:'/forms/P-RS1-001-03.02.pdf'},
     {code:'P-RS1 002-02.02', label:'Ký Nhận & Thu Hồi TB', file:'/forms/P-RS1-002-02.02.pdf'}
   ]
+const T = {
+  vi: {
+    title: '📄 Bước 4 – Thông Báo Chế Biến & Quy Cách Sản Phẩm Mới',
+    subtitle: 'Biểu mẫu P-RS1 001-01.02 · 001-03.02 · 001-07 – Thông báo, quy cách, hướng dẫn kỹ thuật',
+  },
+  zh: {
+    title: '📄 步骤4 – 新品生产通知与规格',
+    subtitle: '表单 P-RS1 001-01.02 · 001-03.02 · 001-07 – 通知、规格、技术指导',
+  },
+}
+
 export default function NewProductNotice() {
+  const { lang } = useLang()
+  const tx = T[lang] || T.vi
   const navigate = useNavigate()
   const [pdf, setPdf] = useState(null)
   const [tab, setTab] = useState('notice')
@@ -46,7 +60,7 @@ export default function NewProductNotice() {
       <div className="sg" style={{flex:1}}>
       <div className="ph">
         <div>
-          <h1>📄 Bước 4 – Thông Báo Chế Biến & Quy Cách Sản Phẩm Mới</h1>
+          <h1>{tx.title}</h1>
           <p>P-RS1 001-01.02 – Bảng Thông Báo Chế Biến · P-RS1 001-03.02 – Bảng Diễn Giải Quy Cách Sản Phẩm Mới</p>
         </div>
         <div className="fl ic g8">

@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { useLang } from '../../i18n/context'
 import { AreaChart, Area, BarChart, Bar, LineChart, Line,
          XAxis, YAxis, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, ReferenceLine } from 'recharts'
 
@@ -37,13 +38,36 @@ const scope = [
   {s:'Scope 3 - Van chuyen & chuoi cung ung',val:5.7,color:'#0078d4',pct:14},
 ]
 
+const T = {
+  vi: {
+    title: '⚡ Quản Lý Năng Lượng & Môi Trường',
+    subtitle: 'Phân tích tiêu thụ, đề xuất tối ưu, tính phát thải carbon – Hỗ trợ báo cáo ESG',
+    tabs: ['💡 Tối ưu AI','🏭 Tiêu thụ thiết bị','📈 ESG & Carbon'],
+    kpi: ['Điện tuần này (kWh)','Hơi nước (GJ)','CO₂ phát thải (tCO₂e)','Tiết kiệm ước tính','PUE (Power Usage Eff.)','Điện đặc thù (kWh/thùng)'],
+    kpiSub: ['4.2% so tuần trước','1.1% so tuần trước','Tháng 6 lũy kế','Từ tối ưu hóa AI','Mục tiêu: <= 1.10','4% so tháng trước'],
+    tabLabels: ['💡 Tối ưu AI','🏭 Tiêu thụ thiết bị','📈 ESG & Carbon'],
+    jsTabs: ['Tong quan','Theo day chuyen','Xu huong thang','ESG & Carbon'],
+  },
+  zh: {
+    title: '⚡ 能源与环境管理',
+    subtitle: '分析能耗，提出优化建议，计算碳排放 – 支持ESG报告',
+    tabs: ['💡 AI优化', '🏭 设备能耗', '📈 ESG与碳排放'],
+    kpi: ['本周用电(kWh)','蒸汽(GJ)','CO₂排放(tCO₂e)','预计节省','PUE','单箱用电(kWh/箱)'],
+    kpiSub: ['较上周+4.2%','较上周+1.1%','6月累计','来自AI优化','目标: <= 1.10','较上月-4%'],
+    tabLabels: ['💡 AI优化','🏭 设备能耗','📈 ESG与碳排放'],
+    jsTabs: ['总览','按产线','月趋势','ESG与碳排放'],
+  },
+}
+
 export default function EnergyManagement() {
+  const { lang } = useLang()
+  const tx = T[lang] || T.vi
   const [tab, setTab] = useState(0)
 
   return (
     <div className="sg">
       <div className="ph">
-        <div><h1>⚡ Quan Ly Nang Luong & Moi Truong</h1><p>Phan tich tieu thu, de xuat toi uu, tinh phat thai carbon – Ho tro bao cao ESG</p></div>
+        <div><h1>{tx.title}</h1><p>{tx.subtitle}</p></div>
         <div className="fl g8">
           <button className="btn btn-outline btn-sm">📄 Xuat bao cao ESG</button>
           <button className="btn btn-outline btn-sm">📊 So sanh ky truoc</button>
@@ -52,12 +76,12 @@ export default function EnergyManagement() {
 
       <div className="sg4">
         {[
-          {label:'Dien tuan nay (kWh)',val:'7,782',sub:'4.2% so tuan truoc',color:'#0078d4'},
-          {label:'Hoi nuoc (GJ)',val:'193',sub:'1.1% so tuan truoc',color:'#d97706'},
-          {label:'CO2 phat thai (tCO2e)',val:'42.3',sub:'Thang 6 luy ke',color:'#107c10'},
-          {label:'Tiet kiem uoc tinh',val:'2.4M',sub:'Tu toi uu hoa AI',color:'#00897b'},
-          {label:'PUE (Power Usage Eff.)',val:'1.08',sub:'Muc tieu: <= 1.10',color:'#0078d4'},
-          {label:'Dien dac thu (kWh/thung)',val:'0.028',sub:'4% so thang truoc',color:'#107c10'},
+          {label:tx.kpi[0],val:'7,782',sub:'4.2% so tuan truoc',color:'#0078d4'},
+          {label:tx.kpi[1],val:'193',sub:'1.1% so tuan truoc',color:'#d97706'},
+          {label:tx.kpi[2],val:'42.3',sub:'Thang 6 luy ke',color:'#107c10'},
+          {label:tx.kpi[3],val:'2.4M',sub:'Tu toi uu hoa AI',color:'#00897b'},
+          {label:tx.kpi[4],val:'1.08',sub:'Muc tieu: <= 1.10',color:'#0078d4'},
+          {label:tx.kpi[5],val:'0.028',sub:'4% so thang truoc',color:'#107c10'},
         ].map((s,i)=>(
           <div className="sc" key={i}>
             <div className="sc-label">{s.label}</div>
@@ -76,7 +100,7 @@ export default function EnergyManagement() {
       </div>
 
       <div className="tabs">
-        {['Tong quan','Theo day chuyen','Xu huong thang','ESG & Carbon'].map((t,i)=>(
+        {tx.jsTabs.map((t,i)=>(
           <div key={i} className={`tab ${tab===i?'active':''}`} onClick={()=>setTab(i)}>{t}</div>
         ))}
       </div>

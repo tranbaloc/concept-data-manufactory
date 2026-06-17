@@ -1,5 +1,5 @@
-import { useState } from 'react'
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
+import { LangProvider } from './i18n/context'
 import Layout from './components/Layout'
 import Dashboard from './pages/Dashboard'
 import FormulaGenerator from './pages/rd/FormulaGenerator'
@@ -31,9 +31,11 @@ import NewProductNotice from './pages/orders/NewProductNotice'
 import AcceptanceSpecs from './pages/orders/AcceptanceSpecs'
 import ProductConfirm from './pages/orders/ProductConfirm'
 import ProductionOrder from './pages/orders/ProductionOrder'
+import EngineeringChange from './pages/orders/EngineeringChange'
 
 export default function App() {
   return (
+    <LangProvider>
     <BrowserRouter>
       <Routes>
         <Route path="/" element={<Layout />}>
@@ -50,6 +52,7 @@ export default function App() {
           <Route path="orders/acceptance-specs" element={<AcceptanceSpecs />} />
           <Route path="orders/product-confirm" element={<ProductConfirm />} />
           <Route path="orders/production-order" element={<ProductionOrder />} />
+          <Route path="orders/engineering-change" element={<EngineeringChange />} />
 
           {/* R&D */}
           <Route path="rd/formula-gen" element={<FormulaGenerator />} />
@@ -77,9 +80,10 @@ export default function App() {
           <Route path="warehouse/statistics" element={<DataStatistics />} />
 
           {/* Management */}
-          <Route path="management/delivery" element={<DeliveryCalc />} />
+              <Route path="management/delivery" element={<DeliveryCalc />} />
         </Route>
       </Routes>
     </BrowserRouter>
+    </LangProvider>
   )
 }

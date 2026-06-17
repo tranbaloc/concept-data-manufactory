@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { useLang } from '../../i18n/context'
 import { BarChart, Bar, LineChart, Line, XAxis, YAxis, Tooltip,
          ResponsiveContainer, Cell, PieChart, Pie } from 'recharts'
 
@@ -94,7 +95,46 @@ const catColor = c=>({'Thanh pham':'#0078d4','Nguyen lieu':'#107c10','Bao bi':'#
 const statusBadge = s=>s==='Binh thuong'?'badge-green':s==='Thieu'?'badge-red':'badge-yellow'
 const CATS = ['Tat ca','Thanh pham','Nguyen lieu','Bao bi','Hoa chat']
 
+const T = {
+  vi: {
+    title: '📦 Quản Lý Tồn Kho',
+    subtitle: 'Real-time inventory tracking · {n} SKU · Cập nhật lúc 08:47',
+    tabs: ['📋 Chi tiết SKU', '📜 Lịch sử giao dịch', '📊 Tổng quan danh mục', '📈 Xu hướng tồn kho'],
+    thTx: 'Ngày', thTxType: 'Loại', thTxQty: 'Số lượng', thTxCode: 'Mã phiếu', thTxNote: 'Ghi chú',
+    thSku: 'Mã SKU', thName: 'Tên hàng', thCat: 'Danh mục', thStock: 'Tồn kho', thMinMax: 'Min / Max',
+    thIn7: 'Nhập 7N', thOut7: 'Xuất 7N', thLoc: 'Vị trí', thStatus: 'Trạng thái',
+    kpi: ['Tổng SKU quản lý','Dưới mức tối thiểu','Cảnh báo sắp hết','Xuất kho 7 ngày'],
+    kpiSub: ['4 danh mục','Cần nhập bổ sung','Trong 7 ngày tới','4% so tuần trước'],
+    outerTabs: ['📋 Chi tiết SKU','📜 Lịch sử giao dịch','📊 Tổng quan danh mục','📈 Xu hướng tồn kho'],
+    lStock: 'Tồn kho',
+    lMin: 'Tối thiểu',
+    lMax: 'Tối đa',
+    lIn7: 'Nhập 7 ngày',
+    lOut7: 'Xuất 7 ngày',
+    jsTabs: ['Danh sách SKU','Xu hướng tồn kho','Phân bố danh mục'],
+  },
+  zh: {
+    title: '📦 库存管理',
+    subtitle: '实时库存跟踪 · {n} SKU · 更新于08:47',
+    tabs: ['📋 SKU详情', '📜 交易历史', '📊 品类总览', '📈 库存趋势'],
+    thTx: '日期', thTxType: '类型', thTxQty: '数量', thTxCode: '单据编号', thTxNote: '备注',
+    thSku: 'SKU编号', thName: '品名', thCat: '品类', thStock: '库存', thMinMax: '最小/最大',
+    thIn7: '7天入库', thOut7: '7天出库', thLoc: '位置', thStatus: '状态',
+    kpi: ['管理SKU总数','低于最低库存','即将耗尽警告','7天出库'],
+    kpiSub: ['4个品类','需补货','7天内','较上周-4%'],
+    outerTabs: ['📋 SKU详情','📜 交易历史','📊 品类总览','📈 库存趋势'],
+    lStock: '库存',
+    lMin: '最小值',
+    lMax: '最大值',
+    lIn7: '7天入库',
+    lOut7: '7天出库',
+    jsTabs: ['SKU列表','库存趋势','品类分布'],
+  },
+}
+
 export default function InventoryManagement() {
+  const { lang } = useLang()
+  const tx = T[lang] || T.vi
   const [cat, setCat] = useState('Tat ca')
   const [search, setSearch] = useState('')
   const [selected, setSelected] = useState(null)
@@ -110,7 +150,7 @@ export default function InventoryManagement() {
   return (
     <div className="sg">
       <div className="ph">
-        <div><h1>📦 Quản Lý Tồn Kho</h1><p>Real-time inventory tracking · {items.length} SKU · Cập nhật lúc 08:47</p></div>
+        <div><h1>{tx.title}</h1><p>{tx.subtitle.replace('{n}', items.length)}</p></div>
         <div className="fl g8">
           <button className="btn btn-primary btn-sm">+ Nhập kho</button>
           <button className="btn btn-outline btn-sm">📤 Xuất kho</button>
@@ -119,10 +159,10 @@ export default function InventoryManagement() {
       </div>
       <div className="sg4">
         {[
-          {label:'Tổng SKU quản lý',val:`${items.length}`,sub:'4 danh mục',color:'#0078d4'},
-          {label:'Dưới mức tối thiểu',val:'3',sub:'Cần nhập bổ sung',color:'#d13438'},
-          {label:'Cảnh báo sắp hết',val:'2',sub:'Trong 7 ngày tới',color:'#d97706'},
-          {label:'Xuất kho 7 ngày',val:'~18.3T',sub:'4% so tuần trước',color:'#107c10'},
+          {label:tx.kpi[0],val:`${items.length}`,sub:tx.kpiSub[0],color:'#0078d4'},
+          {label:tx.kpi[1],val:'3',sub:tx.kpiSub[1],color:'#d13438'},
+          {label:tx.kpi[2],val:'2',sub:tx.kpiSub[2],color:'#d97706'},
+          {label:tx.kpi[3],val:'~18.3T',sub:tx.kpiSub[3],color:'#107c10'},
         ].map((s,i)=>(
           <div className="sc" key={i}>
             <div className="sc-label">{s.label}</div>
@@ -154,11 +194,11 @@ export default function InventoryManagement() {
           </div>
           <div style={{display:'grid',gridTemplateColumns:'repeat(5,1fr)',gap:10,marginBottom:16}}>
             {[
-              {label:'Tồn kho',val:`${item.qty.toLocaleString()} ${item.unit}`,color:item.qty<item.min?'#d13438':item.qty<item.min*1.3?'#d97706':'#107c10'},
-              {label:'Tối thiểu',val:`${item.min.toLocaleString()}`,color:'#d97706'},
-              {label:'Tối đa',val:`${item.max.toLocaleString()}`,color:'#0078d4'},
-              {label:'Nhập 7 ngày',val:`+${item.in7.toLocaleString()}`,color:'#107c10'},
-              {label:'Xuất 7 ngày',val:`-${item.out7.toLocaleString()}`,color:'#d13438'},
+              {label:tx.lStock,val:`${item.qty.toLocaleString()} ${item.unit}`,color:item.qty<item.min?'#d13438':item.qty<item.min*1.3?'#d97706':'#107c10'},
+              {label:tx.lMin,val:`${item.min.toLocaleString()}`,color:'#d97706'},
+              {label:tx.lMax,val:`${item.max.toLocaleString()}`,color:'#0078d4'},
+              {label:tx.lIn7,val:`+${item.in7.toLocaleString()}`,color:'#107c10'},
+              {label:tx.lOut7,val:`-${item.out7.toLocaleString()}`,color:'#d13438'},
             ].map((k,i)=>(
               <div key={i} style={{textAlign:'center',background:'var(--bg)',borderRadius:8,padding:'10px 8px',border:'1px solid var(--border)'}}>
                 <div style={{fontSize:11,color:'var(--text2)',marginBottom:4}}>{k.label}</div>
@@ -176,7 +216,7 @@ export default function InventoryManagement() {
           </div>
           <div className="tsm fw6 mb8">📋 Lịch sử nhập/xuất gần nhất</div>
           <div className="tw"><table>
-            <thead><tr><th>Ngày</th><th>Loại</th><th>Số lượng</th><th>Mã phiếu</th><th>Ghi chú</th></tr></thead>
+            <thead><tr><th>{tx.thTx}</th><th>{tx.thTxType}</th><th>{tx.thTxQty}</th><th>{tx.thTxCode}</th><th>{tx.thTxNote}</th></tr></thead>
             <tbody>{item.history.map((h,i)=>(
               <tr key={i}>
                 <td className="fw5">{h.date}</td>
@@ -189,7 +229,7 @@ export default function InventoryManagement() {
         </div>
       )}
       <div className="tabs">
-        {['Danh sách SKU','Xu hướng tồn kho','Phân bố danh mục'].map((t,i)=>(
+        {tx.jsTabs.map((t,i)=>(
           <div key={i} className={`tab ${tab===i?'active':''}`} onClick={()=>setTab(i)}>{t}</div>
         ))}
       </div>
@@ -205,7 +245,7 @@ export default function InventoryManagement() {
             <div className="ir" style={{width:200}}><input placeholder="Tìm mã/tên..." value={search} onChange={e=>setSearch(e.target.value)}/></div>
           </div>
           <div className="tw"><table>
-            <thead><tr><th>Mã SKU</th><th>Tên hàng</th><th>Danh mục</th><th>Tồn kho</th><th>Min / Max</th><th>Nhập 7N</th><th>Xuất 7N</th><th>Vị trí</th><th>Trạng thái</th></tr></thead>
+            <thead><tr><th>{tx.thSku}</th><th>{tx.thName}</th><th>{tx.thCat}</th><th>{tx.thStock}</th><th>{tx.thMinMax}</th><th>{tx.thIn7}</th><th>{tx.thOut7}</th><th>{tx.thLoc}</th><th>{tx.thStatus}</th></tr></thead>
             <tbody>{filtered.map((it,i)=>(
               <tr key={i} onClick={()=>setSelected(it.code===selected?null:it.code)} style={{cursor:'pointer',background:it.code===selected?'#e8f4fd':undefined}}>
                 <td className="fw5 tb tsm">{it.code}</td><td className="fw5">{it.name}</td>

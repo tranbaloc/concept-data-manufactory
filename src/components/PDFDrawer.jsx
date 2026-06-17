@@ -1,4 +1,5 @@
 import { useEffect } from 'react'
+import { useLang } from '../i18n/context'
 
 /**
  * Slide-in PDF drawer
@@ -6,6 +7,7 @@ import { useEffect } from 'react'
  * Render null when url is falsy.
  */
 export default function PDFDrawer({ url, title, onClose }) {
+  const { t } = useLang()
   // Close on Escape
   useEffect(() => {
     if (!url) return
@@ -57,7 +59,7 @@ export default function PDFDrawer({ url, title, onClose }) {
             download
             style={{ color: '#fff', fontSize: 12, textDecoration: 'none', padding: '4px 10px', border: '1px solid rgba(255,255,255,0.5)', borderRadius: 4, marginRight: 6 }}
           >
-            ⬇ Tải PDF
+            {t('common.viewPDF')}
           </a>
           <button
             onClick={onClose}

@@ -3,6 +3,7 @@ import PDFDrawer from '../../components/PDFDrawer'
 import FormsBanner from '../../components/FormsBanner'
 import FormsPanel from '../../components/FormsPanel'
 import { useNavigate } from 'react-router-dom'
+import { useLang } from '../../i18n/context'
 
 
 function StepBar({ active }) {
@@ -47,7 +48,20 @@ const mockResult = {
 const FORMS = [
     {code:'P-RS1 003-01.03', label:'Sample Report', file:'/forms/P-RS1-003-01.03.pdf'}
   ]
+const T = {
+  vi: {
+    title: '🧪 Bước 3 – R&D Sample Report',
+    subtitle: 'Biểu mẫu P-RS1 003-01.03 – Báo cáo mẫu thử & phân tích chất lượng',
+  },
+  zh: {
+    title: '🧪 步骤3 – R&D样品报告',
+    subtitle: '表单 P-RS1 003-01.03 – 样品报告与质量分析',
+  },
+}
+
 export default function SampleReport() {
+  const { lang } = useLang()
+  const tx = T[lang] || T.vi
   const navigate = useNavigate()
   const [pdf, setPdf] = useState(null)
   const [tab, setTab] = useState('report')
@@ -64,7 +78,7 @@ export default function SampleReport() {
       <div className="sg" style={{flex:1}}>
       <div className="ph">
         <div>
-          <h1>🧪 Bước 3 – R&D Sample Report</h1>
+          <h1>{tx.title}</h1>
           <p>Biểu mẫu P-RS1 003-01.03 – SAMPLE REPORT · Phân tích mẫu từng công đoạn sản xuất</p>
         </div>
         <div className="fl ic g8">

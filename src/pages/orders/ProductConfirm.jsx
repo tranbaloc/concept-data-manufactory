@@ -2,6 +2,7 @@ import { useState } from 'react'
 import PDFDrawer from '../../components/PDFDrawer'
 import FormsPanel from '../../components/FormsPanel'
 import { useNavigate } from 'react-router-dom'
+import { useLang } from '../../i18n/context'
 
 
 function StepBar({ active }) {
@@ -42,7 +43,28 @@ const depts = [
 const FORMS = [
     {code:'P-RS1 001-06.03', label:'Xác Nhận Sản Phẩm', file:'/forms/P-RS1-001-06.03.pdf'}
   ]
+const T = {
+  vi: {
+    title: '🤝 Bước 6 – Xác Nhận Sản Phẩm (Họp Phối Hợp)',
+    subtitle: 'Biểu mẫu P-RS1 001-06.03 – Biên Bản Họp Phối Hợp 7 Bộ Phận',
+    confirm: 'Xác nhận',
+    pending: 'Chờ',
+    confirmAll: '✅ Xác Nhận & Xuất Lệnh SX',
+    next: '→ Bước 7: Lệnh SX',
+  },
+  zh: {
+    title: '🤝 步骤6 – 产品确认（协调会议）',
+    subtitle: '表单 P-RS1 001-06.03 – 7部门协调会议记录',
+    confirm: '确认',
+    pending: '待定',
+    confirmAll: '✅ 确认并下达生产指令',
+    next: '→ 步骤7：生产指令',
+  },
+}
+
 export default function ProductConfirm() {
+  const { lang } = useLang()
+  const tx = T[lang] || T.vi
   const navigate = useNavigate()
 const [pdf, setPdf] = useState(null)
     const [statuses, setStatuses] = useState(depts.map(d => d.status))

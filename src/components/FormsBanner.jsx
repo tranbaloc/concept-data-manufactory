@@ -1,4 +1,6 @@
+import { useLang } from '../i18n/context'
 export default function FormsBanner({ forms, onOpen }) {
+  const { t } = useLang()
   if (!forms || !forms.length) return null
   return (
     <div style={{
@@ -13,7 +15,7 @@ export default function FormsBanner({ forms, onOpen }) {
       flexWrap: 'wrap',
     }}>
       <span style={{ fontSize: 11, fontWeight: 700, color: 'var(--blue)', whiteSpace: 'nowrap', marginRight: 2 }}>
-        Bieu mau:
+        {t('common.forms')}
       </span>
       {forms.map(function(f) {
         return (

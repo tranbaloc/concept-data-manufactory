@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { useLang } from '../../i18n/context'
 
 const docs = [
   {id:'DOC-001',title:'Sổ tay bảo trì máy chiết MX-01',type:'Bảo trì',equipment:'MX-01',updated:'2026-05-12',version:'v3.2',tags:['chiết','cơ khí','ổ bi'],size:'2.4MB'},
@@ -22,7 +23,46 @@ const aiSuggestions = [
   {q:'Áp suất đầu ra RO bình thường là bao nhiêu?',a:'Theo DOC-003 v4.1: Áp suất đầu ra hệ thống RO chuẩn: 3.5–4.0 bar. Nếu dưới 2.5 bar: kiểm tra màng RO và van tiết lưu. Nếu dưới 2.0 bar: có thể cần thay màng (thọ ~12 tháng). Ghi chú: Đặt lịch backwash mỗi 72 giờ vận hành.',src:'DOC-003 tr.14–17'},
 ]
 
+const T = {
+  vi: {
+    title: '📚 Quản Lý Tài Liệu & Kiến Thức',
+    subtitle: 'AI tìm kiếm sổ tay bảo trì, hồ sơ lịch sử sửa chữa và đề xuất giải pháp kỹ thuật nhanh',
+    tabs: ['📄 Tài liệu', '🔧 Hồ sơ sửa chữa', '🤖 AI hỏi đáp'],
+    kpi: ['Tài liệu trong hệ thống','Hồ sơ sửa chữa','Truy cập tháng này','Giải pháp AI được áp dụng'],
+    kpiSub: ['3 loại danh mục','12 tháng gần nhất','↑ 23% so tháng trước','Tỷ lệ thành công: 94%'],
+    outerTabs: ['📄 Tài liệu','🔧 Hồ sơ sửa chữa','🤖 AI hỏi đáp'],
+    thId: 'Mã TL',
+    thTitle: 'Tiêu đề',
+    thType: 'Loại',
+    thEquip: 'Thiết bị',
+    thUpdated: 'Cập nhật',
+    thVersion: 'Phiên bản',
+    thSize: 'Kích thước',
+    thAction: 'Hành động',
+    jsTabs: ['Thư viện tài liệu','Hồ sơ sửa chữa','AI tra cứu nhanh'],
+  },
+  zh: {
+    title: '📚 文档与知识库管理',
+    subtitle: 'AI搜索维护手册、维修历史记录并快速提出技术解决方案',
+    tabs: ['📄 文档', '🔧 维修记录', '🤖 AI问答'],
+    kpi: ['系统文档数','维修记录','本月访问次数','AI方案已应用'],
+    kpiSub: ['3个类别','近12个月','↑ 较上月23%','成功率: 94%'],
+    outerTabs: ['📄 文档','🔧 维修记录','🤖 AI问答'],
+    thId: '编号',
+    thTitle: '标题',
+    thType: '类型',
+    thEquip: '设备',
+    thUpdated: '更新日期',
+    thVersion: '版本',
+    thSize: '大小',
+    thAction: '操作',
+    jsTabs: ['文档库','维修记录','AI快速查询'],
+  },
+}
+
 export default function KnowledgeBase() {
+  const { lang } = useLang()
+  const tx = T[lang] || T.vi
   const [tab, setTab] = useState(0)
   const [search, setSearch] = useState('')
   const [chatInput, setChatInput] = useState('')
@@ -53,7 +93,7 @@ export default function KnowledgeBase() {
   return (
     <div className="sg">
       <div className="ph">
-        <div><h1>📚 Quản Lý Tài Liệu & Kiến Thức</h1><p>AI tìm kiếm sổ tay bảo trì, hồ sơ lịch sử sửa chữa và đề xuất giải pháp kỹ thuật nhanh</p></div>
+        <div><h1>{tx.title}</h1><p>{tx.subtitle}</p></div>
         <div className="fl g8">
           <button className="btn btn-primary">+ Tải tài liệu lên</button>
         </div>
@@ -61,15 +101,15 @@ export default function KnowledgeBase() {
 
       <div className="sg4">
         {[
-          {label:'Tài liệu trong hệ thống',val:'6',sub:'3 loại danh mục',color:'#0078d4'},
-          {label:'Hồ sơ sửa chữa',val:'47',sub:'12 tháng gần nhất',color:'#107c10'},
-          {label:'Truy cập tháng này',val:'132',sub:'↑ 23% so tháng trước',color:'#7c3aed'},
-          {label:'Giải pháp AI được áp dụng',val:'18',sub:'Tỷ lệ thành công: 94%',color:'#d97706'},
+          {label:tx.kpi[0],val:'6',sub:tx.kpiSub[0],color:'#0078d4'},
+          {label:tx.kpi[1],val:'47',sub:tx.kpiSub[1],color:'#107c10'},
+          {label:tx.kpi[2],val:'132',sub:tx.kpiSub[2],color:'#7c3aed'},
+          {label:tx.kpi[3],val:'18',sub:tx.kpiSub[3],color:'#d97706'},
         ].map((s,i)=><div className="sc" key={i}><div className="sc-label">{s.label}</div><div className="sc-value" style={{color:s.color}}>{s.val}</div><div className="sc-sub">{s.sub}</div></div>)}
       </div>
 
       <div className="tabs">
-        {['Thư viện tài liệu','Hồ sơ sửa chữa','AI tra cứu nhanh'].map((t,i)=>(
+        {tx.jsTabs.map((t,i)=>(
           <div key={i} className={`tab ${tab===i?'active':''}`} onClick={()=>setTab(i)}>{t}</div>
         ))}
       </div>

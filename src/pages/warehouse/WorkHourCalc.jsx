@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { useLang } from '../../i18n/context'
 const swipeData = [
   {emp:'NV001',name:'Nguyễn Văn An',in:'07:54',out:'17:12',regular:8.3,ot:0.3,total:8.6},
   {emp:'NV002',name:'Trần Thị Bình',in:'08:01',out:'18:45',regular:8.0,ot:1.75,total:9.75},
@@ -8,7 +9,26 @@ const swipeData = [
   {emp:'NV006',name:'Hoàng Thị Em',in:'08:05',out:'17:30',regular:8.0,ot:0.5,total:8.5},
 ]
 
+const T = {
+  vi: {
+    title: '⏱️ Tính Giờ Công Tự Động',
+    subtitle: 'AI đọc dữ liệu thẻ quẹt, phân tích giờ hành chính + tăng ca – Không cần tính thủ công',
+    thEmpId: 'Mã NV', thName: 'Họ tên', thIn: 'Giờ vào', thOut: 'Giờ ra',
+    thReg: 'Giờ HC (h)', thOT: 'Tăng ca (h)', thTotal: 'Tổng (h)', thNote: 'Ghi chú AI',
+    kpi: ['Tổng nhân viên hôm nay','Tổng giờ hành chính','Tổng giờ tăng ca'],
+  },
+  zh: {
+    title: '⏱️ 自动工时计算',
+    subtitle: 'AI读取打卡数据，分析正班+加班时间 – 无需手动计算',
+    thEmpId: '员工编号', thName: '姓名', thIn: '上班时间', thOut: '下班时间',
+    thReg: '正班(h)', thOT: '加班(h)', thTotal: '合计(h)', thNote: 'AI备注',
+    kpi: ['今日员工总数','总正班时长','总加班时长'],
+  },
+}
+
 export default function WorkHourCalc() {
+  const { lang } = useLang()
+  const tx = T[lang] || T.vi
   const [file, setFile] = useState(null)
   const [analyzed, setAnalyzed] = useState(false)
   const totalReg = swipeData.reduce((s,r)=>s+r.regular,0)
@@ -16,12 +36,12 @@ export default function WorkHourCalc() {
 
   return (
     <div className="sg">
-      <div className="ph"><div><h1>⏱️ Tính Giờ Công Tự Động</h1><p>AI đọc dữ liệu thẻ quẹt, phân tích giờ hành chính + tăng ca – Không cần tính thủ công</p></div></div>
+      <div className="ph"><div><h1>{tx.title}</h1><p>{tx.subtitle}</p></div></div>
       <div className="sg3">
         {[
-          {label:'Tổng nhân viên hôm nay',val:`${swipeData.length}`,color:'#0078d4'},
-          {label:'Tổng giờ hành chính',val:`${totalReg.toFixed(1)}h`,color:'#107c10'},
-          {label:'Tổng giờ tăng ca',val:`${totalOT.toFixed(1)}h`,color:'#d97706'},
+          {label:tx.kpi[0],val:`${swipeData.length}`,color:'#0078d4'},
+          {label:tx.kpi[1],val:`${totalReg.toFixed(1)}h`,color:'#107c10'},
+          {label:tx.kpi[2],val:`${totalOT.toFixed(1)}h`,color:'#d97706'},
         ].map((s,i)=><div className="sc" key={i}><div className="sc-label">{s.label}</div><div className="sc-value" style={{color:s.color}}>{s.val}</div></div>)}
       </div>
 
@@ -49,7 +69,7 @@ export default function WorkHourCalc() {
               <div className="fl g8"><button className="btn btn-outline btn-sm">📥 Xuất Excel</button><button className="btn btn-ghost btn-sm" onClick={()=>setAnalyzed(false)}>🔄 Phân tích lại</button></div>
             </div>
             <div className="tw"><table>
-              <thead><tr><th>Mã NV</th><th>Họ tên</th><th>Giờ vào</th><th>Giờ ra</th><th>Giờ HC (h)</th><th>Tăng ca (h)</th><th>Tổng (h)</th><th>Ghi chú AI</th></tr></thead>
+              <thead><tr><th>{tx.thEmpId}</th><th>{tx.thName}</th><th>{tx.thIn}</th><th>{tx.thOut}</th><th>{tx.thReg}</th><th>{tx.thOT}</th><th>{tx.thTotal}</th><th>{tx.thNote}</th></tr></thead>
               <tbody>{swipeData.map((r,i)=>(
                 <tr key={i}>
                   <td className="fw5 tb">{r.emp}</td>

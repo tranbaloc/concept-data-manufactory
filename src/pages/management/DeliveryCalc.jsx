@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { useLang } from '../../i18n/context'
 const calcResult = [
   {code:'PM-PET-330',name:'Bao bì PET 330ml',orderQty:50000,leadDays:5,stockNow:45000,need:5000,orderDate:'09/06',deliveryDate:'14/06',status:'Đúng hạn'},
   {code:'PM-PET-500',name:'Bao bì PET 500ml',orderQty:30200,leadDays:5,stockNow:18600,need:11600,orderDate:'09/06',deliveryDate:'14/06',status:'Cần đặt ngay'},
@@ -7,7 +8,26 @@ const calcResult = [
   {code:'PM-NAP',name:'Nắp nhựa trắng',orderQty:80600,leadDays:4,stockNow:120000,need:0,orderDate:'—',deliveryDate:'—',status:'Đủ kho'},
   {code:'PM-THUNG',name:'Thùng carton',orderQty:6750,leadDays:3,stockNow:17600,need:0,orderDate:'—',deliveryDate:'—',status:'Đủ kho'},
 ]
+const T = {
+  vi: {
+    title: '🚚 Tính Toán Ngày Giao Hàng & Kế Hoạch Đặt Mua',
+    subtitle: 'AI tính lượng đặt bao bì, lead time NCC, ngày cần đặt hàng để đảm bảo đúng deadline sản xuất',
+    thCode: 'Mã bao bì', thName: 'Tên bao bì', thNeed: 'Nhu cầu SX', thStock: 'Tồn kho',
+    thOrder: 'Cần đặt', thLead: 'Lead time', thOrderDate: 'Ngày đặt', thRecv: 'Ngày nhận', thStatus: 'Trạng thái',
+    kpi: ['Đơn hàng cần tính','Bao bì cần đặt ngay','Bao bì đủ kho'],
+  },
+  zh: {
+    title: '🚚 交货日期与采购计划计算',
+    subtitle: 'AI计算包装订购量、供应商交货期、下单日期以确保准时生产',
+    thCode: '包装编号', thName: '包装名称', thNeed: '生产需求', thStock: '库存',
+    thOrder: '需订购', thLead: '交货期', thOrderDate: '下单日期', thRecv: '收货日期', thStatus: '状态',
+    kpi: ['需计算的订单','需立即订购的包装','库存充足的包装'],
+  },
+}
+
 export default function DeliveryCalc() {
+  const { lang } = useLang()
+  const tx = T[lang] || T.vi
   const [prodQty, setProdQty] = useState('')
   const [deadline, setDeadline] = useState('')
   const [product, setProduct] = useState('NC-CAM-330')
@@ -15,12 +35,12 @@ export default function DeliveryCalc() {
 
   return (
     <div className="sg">
-      <div className="ph"><div><h1>🚚 Tính Toán Ngày Giao Hàng & Kế Hoạch Đặt Mua</h1><p>AI tính lượng đặt bao bì, lead time NCC, ngày cần đặt hàng để đảm bảo đúng deadline sản xuất</p></div></div>
+      <div className="ph"><div><h1>{tx.title}</h1><p>{tx.subtitle}</p></div></div>
       <div className="sg3">
         {[
-          {label:'Đơn hàng cần tính',val:'ORD-2610/11/12',color:'#0078d4'},
-          {label:'Bao bì cần đặt ngay',val:'2 loại',color:'#d13438'},
-          {label:'Bao bì đủ kho',val:'2 loại',color:'#107c10'},
+          {label:tx.kpi[0],val:'ORD-2610/11/12',color:'#0078d4'},
+          {label:tx.kpi[1],val:'2 loại',color:'#d13438'},
+          {label:tx.kpi[2],val:'2 loại',color:'#107c10'},
         ].map((s,i)=><div className="sc" key={i}><div className="sc-label">{s.label}</div><div className="sc-value" style={{color:s.color}}>{s.val}</div></div>)}
       </div>
       <div className="g2">
@@ -76,7 +96,7 @@ export default function DeliveryCalc() {
             <div className="fl g8"><button className="btn btn-outline btn-sm">📥 Xuất Excel</button><button className="btn btn-primary btn-sm">📋 Tạo PR tự động</button></div>
           </div>
           <div className="tw"><table>
-            <thead><tr><th>Mã bao bì</th><th>Tên bao bì</th><th>Nhu cầu SX</th><th>Tồn kho</th><th>Cần đặt</th><th>Lead time</th><th>Ngày đặt</th><th>Ngày nhận</th><th>Trạng thái</th></tr></thead>
+            <thead><tr><th>{tx.thCode}</th><th>{tx.thName}</th><th>{tx.thNeed}</th><th>{tx.thStock}</th><th>{tx.thOrder}</th><th>{tx.thLead}</th><th>{tx.thOrderDate}</th><th>{tx.thRecv}</th><th>{tx.thStatus}</th></tr></thead>
             <tbody>{calcResult.map((r,i)=>(
               <tr key={i}>
                 <td className="fw5 tb tsm">{r.code}</td>

@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { AreaChart, Area, BarChart, Bar, LineChart, Line, XAxis, YAxis, Tooltip,
          ResponsiveContainer, PieChart, Pie, Cell, ReferenceLine } from 'recharts'
 import { useNavigate } from 'react-router-dom'
+import { useLang } from '../i18n/context'
 
 const areaData = [
   {m:'T1',rd:72,kh:85,cv:91,kho:78},{m:'T2',rd:78,kh:82,cv:88,kho:81},
@@ -69,16 +70,17 @@ const deptColors = {
 
 export default function Dashboard() {
   const navigate = useNavigate()
+  const { lang, t } = useLang()
   const [now, setNow] = useState(new Date())
-  const [filterDept, setFilterDept] = useState('Tất cả')
+  const [filterDept, setFilterDept] = useState(t('common.all'))
 
   useEffect(() => {
     const t = setInterval(() => setNow(new Date()), 30000)
     return () => clearInterval(t)
   }, [])
 
-  const depts = ['Tất cả', 'R&D', 'Kế Hoạch', 'Công Vụ', 'Quản Kho', 'Quản Lý']
-  const filtered = filterDept === 'Tất cả' ? modules : modules.filter(m => m.dept === filterDept)
+  const depts = [t('common.all'), 'R&D', 'Kế Hoạch', 'Công Vụ', 'Quản Kho', 'Quản Lý']
+  const filtered = filterDept === t('common.all') ? modules : modules.filter(m => m.dept === filterDept)
   const totalReq = modules.reduce((s, m) => s + m.requests, 0)
   const activeUsers = [...new Set(modules.map(m => m.users))].reduce((a, b) => a + b, 0)
 
@@ -86,21 +88,21 @@ export default function Dashboard() {
     <div className="sg">
       <div className="ph">
         <div>
-          <h1>Tổng Quan Hệ Thống AI</h1>
-          <p>Giavico AI Platform · Cập nhật: {now.toLocaleString('vi-VN')}</p>
+          <h1>{t('dashboard.title')}</h1>
+          <p>{t('dashboard.subtitle')} {now.toLocaleString(lang === 'zh' ? 'zh-CN' : 'vi-VN')}</p>
         </div>
         <div className="fl g8">
-          <span className="badge badge-green"><span className="bdot"/> Hệ thống ổn định</span>
+          <span className="badge badge-green"><span className="bdot"/> {t('dashboard.systemStable')}</span>
         </div>
       </div>
 
       {/* KPI row */}
       <div className="sg4">
         {[
-          {icon:'🧑‍💼',color:'#e8f4fd',ic:'#0078d4',label:'Người dùng hoạt động',val:'54',sub:'▲ +12 so tháng trước',trend:'up'},
-          {icon:'⚡',color:'#e8f8e8',ic:'#107c10',label:'Yêu cầu AI hôm nay',val:totalReq.toLocaleString(),sub:'Đỉnh 14:00–15:00 (210 req)'},
-          {icon:'📦',color:'#fff4e6',ic:'#d97706',label:'Modules hoạt động',val:`${modules.filter(m=>m.status==='Đang dùng').length}/${modules.length}`,sub:`${modules.filter(m=>m.status==='Thử nghiệm').length} đang thử nghiệm`},
-          {icon:'⏱️',color:'#fde7e9',ic:'#107c10',label:'Thời gian phản hồi TB',val:'1.2s',sub:'▼ Giảm 33% so T1/2026',trend:'down'},
+          {icon:'🧑‍💼',color:'#e8f4fd',ic:'#0078d4',label:t('dashboard.kpi.activeUsers'),val:'54',sub:t('dashboard.kpi.activeUsersSub'),trend:'up'},
+          {icon:'⚡',color:'#e8f8e8',ic:'#107c10',label:t('dashboard.kpi.aiRequests'),val:totalReq.toLocaleString(),sub:t('dashboard.kpi.aiRequestsSub')},
+          {icon:'📦',color:'#fff4e6',ic:'#d97706',label:t('dashboard.kpi.activeModules'),val:`${modules.filter(m=>m.status==='Đang dùng').length}/${modules.length}`,sub:`${modules.filter(m=>m.status==='Thử nghiệm').length} ${t('dashboard.kpi.testing')}`},
+          {icon:'⏱️',color:'#fde7e9',ic:'#107c10',label:t('dashboard.kpi.responseTime'),val:'1.2s',sub:t('dashboard.kpi.responseTimeSub'),trend:'down'},
         ].map((s,i) => (
           <div className="sc" key={i}>
             <div className="sc-icon" style={{background:s.color}}><span style={{fontSize:18}}>{s.icon}</span></div>
@@ -114,7 +116,7 @@ export default function Dashboard() {
       {/* Charts row 1 */}
       <div className="g2">
         <div className="card">
-          <div className="card-title"><span className="card-title-left">📈 Hiệu quả sử dụng theo bộ phận (%)</span></div>
+          <div className="card-title"><span className="card-title-left">{t('dashboard.charts.deptEfficiency')}</span></div>
           <ResponsiveContainer width="100%" height={180}>
             <AreaChart data={areaData} margin={{top:5,right:5,bottom:0,left:-20}}>
               <XAxis dataKey="m" tick={{fontSize:11}} />
@@ -133,7 +135,7 @@ export default function Dashboard() {
           </div>
         </div>
         <div className="card">
-          <div className="card-title"><span className="card-title-left">📊 Yêu cầu theo giờ hôm nay</span></div>
+          <div className="card-title"><span className="card-title-left">{t('dashboard.charts.hourlyRequests')}</span></div>
           <ResponsiveContainer width="100%" height={180}>
             <BarChart data={hourlyReq} margin={{top:5,right:5,bottom:0,left:-20}}>
               <XAxis dataKey="h" tick={{fontSize:9}} />
@@ -147,14 +149,14 @@ export default function Dashboard() {
               </Bar>
             </BarChart>
           </ResponsiveContainer>
-          <p className="tsm cm mt4">Đường cam = ngưỡng cao (150 req/h)</p>
+          <p className="tsm cm mt4">{t('dashboard.charts.hourlyNote')}</p>
         </div>
       </div>
 
       {/* Charts row 2 */}
       <div className="g2">
         <div className="card">
-          <div className="card-title"><span className="card-title-left">🍩 Phân bổ yêu cầu theo bộ phận</span></div>
+          <div className="card-title"><span className="card-title-left">{t('dashboard.charts.requestByDept')}</span></div>
           <ResponsiveContainer width="100%" height={170}>
             <PieChart>
               <Pie data={pie} cx="50%" cy="50%" outerRadius={72} innerRadius={36}
@@ -170,18 +172,18 @@ export default function Dashboard() {
           </div>
         </div>
         <div className="card">
-          <div className="card-title"><span className="card-title-left">⏱️ Xu hướng thời gian phản hồi (giây)</span></div>
+          <div className="card-title"><span className="card-title-left">{t('dashboard.charts.responseTimeTrend')}</span></div>
           <ResponsiveContainer width="100%" height={170}>
             <LineChart data={responseTimeTrend} margin={{top:5,right:10,bottom:0,left:-20}}>
               <XAxis dataKey="m" tick={{fontSize:11}}/>
               <YAxis tick={{fontSize:11}} domain={[0.8,2.2]}/>
               <Tooltip formatter={v=>`${v}s`}/>
-              <ReferenceLine y={2.0} stroke="#d13438" strokeDasharray="4 4" label={{value:'Mục tiêu',fontSize:9,fill:'#d13438'}}/>
+              <ReferenceLine y={2.0} stroke="#d13438" strokeDasharray="4 4" label={{value:t('dashboard.charts.target'),fontSize:9,fill:'#d13438'}}/>
               <Line type="monotone" dataKey="rt" stroke="#107c10" strokeWidth={2.5} dot={{r:4,fill:'#107c10'}} name="RT TB"/>
             </LineChart>
           </ResponsiveContainer>
           <div className="fl ic g6 mt4 tsm" style={{justifyContent:'center',color:'#107c10'}}>
-            ▼ Giảm từ 1.8s → 1.2s (–33%) trong 6 tháng
+            {t('dashboard.charts.responseTrendNote')}
           </div>
         </div>
       </div>
@@ -189,7 +191,7 @@ export default function Dashboard() {
       {/* Module table with filter */}
       <div className="card">
         <div className="card-title">
-          <span className="card-title-left">📋 Trạng thái modules ({filtered.length})</span>
+          <span className="card-title-left">{t('dashboard.modules.title')} ({filtered.length})</span>
           <div className="fl g6">
             {depts.map(d=>(
               <button key={d} onClick={()=>setFilterDept(d)}
@@ -205,9 +207,9 @@ export default function Dashboard() {
           <table>
             <thead>
               <tr>
-                <th>Bộ phận</th><th>Module</th><th>Trạng thái</th>
-                <th>Người dùng</th><th>Req/tháng</th><th>So tháng trước</th>
-                <th>Uptime</th><th>Đi đến</th>
+                <th>{t('dashboard.modules.dept')}</th><th>{t('dashboard.modules.module')}</th><th>{t('dashboard.modules.status')}</th>
+                <th>{t('dashboard.modules.users')}</th><th>{t('dashboard.modules.reqMonth')}</th><th>{t('dashboard.modules.vsPrev')}</th>
+                <th>{t('dashboard.modules.uptime')}</th><th>{t('dashboard.modules.goto')}</th>
               </tr>
             </thead>
             <tbody>{filtered.map((m,i)=>(
@@ -242,7 +244,7 @@ export default function Dashboard() {
       {/* Alerts + Activity */}
       <div className="g2">
         <div className="card">
-          <div className="card-title"><span className="card-title-left">🚨 Cảnh báo & Thông báo ({alerts.length})</span></div>
+          <div className="card-title"><span className="card-title-left">{t('dashboard.alerts.title')} ({alerts.length})</span></div>
           <div className="sg" style={{gap:7}}>
             {alerts.map((a,i)=>(
               <div key={i} className={`al al-${a.level}`} style={{fontSize:12}}>
@@ -254,7 +256,7 @@ export default function Dashboard() {
           </div>
         </div>
         <div className="card">
-          <div className="card-title"><span className="card-title-left">🕒 Hoạt động gần đây</span></div>
+          <div className="card-title"><span className="card-title-left">{t('dashboard.activity.title')}</span></div>
           <div className="tl">
             {activity.map((a,i)=>(
               <div className="tl-item" key={i}>

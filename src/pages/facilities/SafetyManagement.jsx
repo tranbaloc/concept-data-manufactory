@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import { useLang } from '../../i18n/context'
 
 /* ── Camera metadata ──────────────────────────────────────────────────────── */
 // Verified free Unsplash photo IDs (fetched from live search results)
@@ -137,7 +138,28 @@ const incidents = [
   {time:'11:05',cam:'CAM-S02',type:'Không mang giày bảo hộ',area:'Kho nguyên liệu',level:'Thấp',action:'Đã nhắc nhở'},
   {time:'13:47',cam:'CAM-S01',type:'Không đeo kính bảo hộ',area:'Khu pha chế',level:'Trung bình',action:'Đã cảnh báo'},
 ]
+const T = {
+  vi: {
+    title: '🦺 An Toàn & Quản Lý Rủi Ro',
+    subtitle: 'Giám sát camera AI, cảnh báo thiên tai, lên lịch tuần tra thông minh',
+    tabs: ['📷 Camera AI', '🌡️ Cảm biến môi trường', '📋 Lịch tuần tra', '📊 Báo cáo'],
+    kpi: ['Sự kiện an toàn hôm nay','Camera đang hoạt động','Cảnh báo thiên tai','Tuần tra theo lịch hôm nay'],
+    kpiSub: ['2 mức cao','100% online','Thời tiết bình thường','1 còn lại 14:00'],
+    outerTabs: ['Giám sát camera','Cảnh báo thiên tai','Tuần tra thông minh'],
+  },
+  zh: {
+    title: '🦺 安全与风险管理',
+    subtitle: 'AI摄像头监控，灾害预警，智能巡检排班',
+    tabs: ['📷 AI摄像头', '🌡️ 环境传感器', '📋 巡检计划', '📊 报告'],
+    kpi: ['今日安全事件','摄像头在线','灾害预警','今日巡检计划'],
+    kpiSub: ['2件高级','100%在线','天气正常','14:00还有1次'],
+    outerTabs: ['摄像头监控','灾害预警','智能巡检'],
+  },
+}
+
 export default function SafetyManagement() {
+  const { lang } = useLang()
+  const tx = T[lang] || T.vi
   const [tab, setTab] = useState(0)
   const [focus, setFocus] = useState(null)   // focused camera ID
 
@@ -145,17 +167,17 @@ export default function SafetyManagement() {
     <div className="sg">
       {/* inject keyframe styles once */}
       <style>{STYLE}</style>
-      <div className="ph"><div><h1>🦺 An Toàn & Quản Lý Rủi Ro</h1><p>Giám sát camera AI, cảnh báo thiên tai, lên lịch tuần tra thông minh</p></div></div>
+      <div className="ph"><div><h1>{tx.title}</h1><p>{tx.subtitle}</p></div></div>
       <div className="sg4">
         {[
-          {label:'Sự kiện an toàn hôm nay',val:'4',sub:'2 mức cao',color:'#d97706'},
-          {label:'Camera đang hoạt động',val:'12/12',sub:'100% online',color:'#107c10'},
-          {label:'Cảnh báo thiên tai',val:'0',sub:'Thời tiết bình thường',color:'#0078d4'},
-          {label:'Tuần tra theo lịch hôm nay',val:'3/4',sub:'1 còn lại 14:00',color:'#0078d4'},
+          {label:tx.kpi[0],val:'4',sub:tx.kpiSub[0],color:'#d97706'},
+          {label:tx.kpi[1],val:'12/12',sub:tx.kpiSub[1],color:'#107c10'},
+          {label:tx.kpi[2],val:'0',sub:tx.kpiSub[2],color:'#0078d4'},
+          {label:tx.kpi[3],val:'3/4',sub:tx.kpiSub[3],color:'#0078d4'},
         ].map((s,i)=><div className="sc" key={i}><div className="sc-label">{s.label}</div><div className="sc-value" style={{color:s.color}}>{s.val}</div><div className="sc-sub">{s.sub}</div></div>)}
       </div>
       <div className="tabs">
-        {['Giám sát camera','Cảnh báo thiên tai','Tuần tra thông minh'].map((t,i)=>(
+        {tx.outerTabs.map((t,i)=>(
           <div key={i} className={`tab ${tab===i?'active':''}`} onClick={()=>setTab(i)}>{t}</div>
         ))}
       </div>

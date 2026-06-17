@@ -3,6 +3,7 @@ import PDFDrawer from '../../components/PDFDrawer'
 import FormsBanner from '../../components/FormsBanner'
 import FormsPanel from '../../components/FormsPanel'
 import { useNavigate } from 'react-router-dom'
+import { useLang } from '../../i18n/context'
 
 
 function StepBar({ active }) {
@@ -46,7 +47,20 @@ const FORMS = [
     {code:'P-RS1 002-03.02', label:'Ký Nhận Sửa Đổi', file:'/forms/P-RS1-002-03.02.pdf'},
     {code:'P-RS1 003-10.01', label:'Ký Nhận QC BTP', file:'/forms/P-RS1-003-10.01.pdf'}
   ]
+const T = {
+  vi: {
+    title: '🏭 Bước 7 – Xuất Lệnh Sản Xuất & Phát Hành Tài Liệu',
+    subtitle: 'Biểu mẫu P-RS1 002-02.02 · 002-04.01 · 003-10.01 – Lệnh sản xuất, phân công NVL, kế hoạch đóng gói',
+  },
+  zh: {
+    title: '🏭 步骤7 – 下达生产指令与文件发布',
+    subtitle: '表单 P-RS1 002-02.02 · 002-04.01 · 003-10.01 – 生产指令、原料分配、包装计划',
+  },
+}
+
 export default function ProductionOrder() {
+  const { lang } = useLang()
+  const tx = T[lang] || T.vi
   const [pdf, setPdf] = useState(null)
   const [tab, setTab] = useState('order')
   const [released, setReleased] = useState(false)
@@ -57,7 +71,7 @@ export default function ProductionOrder() {
       <div className="sg" style={{flex:1}}>
       <div className="ph">
         <div>
-          <h1>🏭 Bước 7 – Xuất Lệnh Sản Xuất & Phát Hành Tài Liệu</h1>
+          <h1>{tx.title}</h1>
           <p>Lệnh sản xuất chính thức · Phát hành và ký nhận các bảng tiêu chuẩn liên quan · Thu hồi phiên bản cũ</p>
         </div>
         <div className="fl ic g8">

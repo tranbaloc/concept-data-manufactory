@@ -1,4 +1,5 @@
 import { RadarChart, Radar, PolarGrid, PolarAngleAxis, ResponsiveContainer, BarChart, Bar, XAxis, YAxis, Tooltip, Legend } from 'recharts'
+import { useLang } from '../../i18n/context'
 
 const formulas = [
   {code:'GV-NC-VN-2026-A3',market:'VN',brix:12.5,ph:3.8,acidPct:0.28,preservePpm:500,vitC:200,sugar:112,cal:48,date:'15/03/2026'},
@@ -22,23 +23,46 @@ const barCompare = [
 
 const COLORS = {'A3':'#0078d4','A2':'#00897b','B2':'#d97706'}
 
+const T = {
+  vi: {
+    title: '📊 So Sánh Công Thức',
+    subtitle: 'Đặt cạnh nhau các phiên bản công thức, phân tích điểm khác biệt và rủi ro',
+    compareCard: '📋 Bảng so sánh tham số',
+    radarCard: '🕸️ Radar so sánh đặc tính',
+    chartCard: '📊 So sánh chỉ số chính',
+    aiCard: '🤖 Phân tích AI – Khuyến nghị',
+    thParam: 'Tham số', thNote: 'Nhận xét AI',
+  },
+  zh: {
+    title: '📊 配方比较',
+    subtitle: '并排比较配方版本，分析差异和风险点',
+    compareCard: '📋 参数对比表',
+    radarCard: '🕸️ 特性雷达图',
+    chartCard: '📊 主要指标对比',
+    aiCard: '🤖 AI分析 – 建议',
+    thParam: '参数', thNote: 'AI备注',
+  },
+}
+
 export default function FormulaComparison() {
+  const { lang } = useLang()
+  const tx = T[lang] || T.vi
   return (
     <div className="sg">
       <div className="ph">
-        <div><h1>📊 So Sánh Công Thức</h1><p>Đặt cạnh nhau các phiên bản công thức, phân tích điểm khác biệt và rủi ro</p></div>
+        <div><h1>{tx.title}</h1><p>{tx.subtitle}</p></div>
         <button className="btn btn-outline btn-sm">+ Thêm công thức</button>
       </div>
 
       <div className="card">
-        <div className="card-title"><span className="card-title-left">📋 Bảng so sánh tham số</span></div>
+        <div className="card-title"><span className="card-title-left">{tx.compareCard}</span></div>
         <div className="tw">
           <table>
             <thead>
               <tr>
-                <th>Tham số</th>
+                <th>{tx.thParam}</th>
                 {formulas.map(f=><th key={f.code}><span className="badge badge-blue">{f.code}</span></th>)}
-                <th>Nhận xét AI</th>
+                <th>{tx.thNote}</th>
               </tr>
             </thead>
             <tbody>
@@ -65,7 +89,7 @@ export default function FormulaComparison() {
 
       <div className="g2">
         <div className="card">
-          <div className="card-title"><span className="card-title-left">🕸️ Radar so sánh đặc tính</span></div>
+          <div className="card-title"><span className="card-title-left">{tx.radarCard}</span></div>
           <ResponsiveContainer width="100%" height={220}>
             <RadarChart data={radar}>
               <PolarGrid/>
@@ -80,7 +104,7 @@ export default function FormulaComparison() {
           </div>
         </div>
         <div className="card">
-          <div className="card-title"><span className="card-title-left">📊 So sánh chỉ số chính</span></div>
+          <div className="card-title"><span className="card-title-left">{tx.chartCard}</span></div>
           <ResponsiveContainer width="100%" height={220}>
             <BarChart data={barCompare} margin={{left:-20}}>
               <XAxis dataKey="name" tick={{fontSize:11}}/>
@@ -96,7 +120,7 @@ export default function FormulaComparison() {
       </div>
 
       <div className="card">
-        <div className="card-title"><span className="card-title-left">🤖 Phân tích AI – Khuyến nghị</span></div>
+        <div className="card-title"><span className="card-title-left">{tx.aiCard}</span></div>
         <div className="sg" style={{gap:10}}>
           <div className="al al-blue">📌 <span><strong>GV-NC-VN-2026-A3</strong> phù hợp nhất cho thị trường VN: cân bằng giữa độ ngọt, độ bảo quản và chi phí nguyên liệu.</span></div>
           <div className="al al-yellow">⚠️ <span><strong>GV-NC-US-2025-B2</strong>: Acid citric 0.30% gần ngưỡng gây ảnh hưởng màu sắc tại nhiệt độ cao. Nên giảm xuống 0.27–0.28% nếu phân phối vùng nhiệt đới.</span></div>

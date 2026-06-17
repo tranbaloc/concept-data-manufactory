@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, ReferenceLine } from 'recharts'
+import { useLang } from '../../i18n/context'
 
 const orders = [
   {id:'ORD-2608',product:'NC Cam 500ml',qty:35000,done:35000,deadline:'08/06',priority:'Cao',status:'Hoan thanh',line:'Line 2',oee:91,
@@ -89,7 +90,44 @@ const statusColor = s=>({
 
 const rcColor = v=>v>=90?'#107c10':v>=75?'#d97706':'#d13438'
 
+const T = {
+  vi: {
+    title: '📅 Lịch Sản Xuất AI',
+    subtitle: 'Tự động lập lịch · Quản lý nguồn lực · Mô phỏng kịch bản tối ưu',
+    tabs: ['📋 Kế hoạch tuần', '📊 Biểu đồ Gantt', '🤖 AI kịch bản'],
+    thOrder: 'Mã ĐH', thProduct: 'Sản phẩm', thQty: 'Số lượng', thProgress: 'Tiến độ',
+    thDeadline: 'Deadline', thPriority: 'Ưu tiên', thStatus: 'Trạng thái', thLine: 'Line', thOEE: 'OEE',
+    thScenario: 'Kịch bản', thEff: 'Hiệu suất', thRisk: 'Đơn nguy cơ trễ', thCost: 'Chi phí', thRiskLevel: 'Rủi ro', thAI: 'AI đề xuất',
+    kpi: ['Đơn hàng tuần 24','Công suất trung bình','Nguy cơ trễ deadline','OEE Line 1 hôm nay'],
+    kpiSub: ['3 đang sản xuất','Mục tiêu: 90%','ORD-2611, ORD-2613','3% so hôm qua'],
+    outerTabs: ['📋 Kế hoạch tuần','📊 Biểu đồ Gantt','🤖 AI kịch bản'],
+    lPlan: 'Kế hoạch',
+    lDone: 'Đã sản xuất',
+    lRemain: 'Còn lại',
+    lOEE: 'OEE',
+    jsTabs: ['Lich Gantt','Danh sach don','Nguon luc & OEE','Mo phong kich ban'],
+  },
+  zh: {
+    title: '📅 AI生产排程',
+    subtitle: '自动排程 · 资源管理 · 最优情景模拟',
+    tabs: ['📋 周计划', '📊 甘特图', '🤖 AI情景'],
+    thOrder: '订单编号', thProduct: '产品', thQty: '数量', thProgress: '进度',
+    thDeadline: '截止日期', thPriority: '优先级', thStatus: '状态', thLine: '产线', thOEE: 'OEE',
+    thScenario: '情景', thEff: '效率', thRisk: '延误风险订单', thCost: '成本', thRiskLevel: '风险', thAI: 'AI建议',
+    kpi: ['第24周订单','平均产能','截止日期风险','今日产线1 OEE'],
+    kpiSub: ['3个生产中','目标: 90%','ORD-2611, ORD-2613','较昨日+3%'],
+    outerTabs: ['📋 周计划','📊 甘特图','🤖 AI情景'],
+    lPlan: '计划',
+    lDone: '已生产',
+    lRemain: '剩余',
+    lOEE: 'OEE',
+    jsTabs: ['甘特图','订单列表','资源与OEE','情景模拟'],
+  },
+}
+
 export default function ProductionSchedule() {
+  const { lang } = useLang()
+  const tx = T[lang] || T.vi
   const [tab, setTab] = useState(0)
   const [selected, setSelected] = useState(null)
   const order = orders.find(o=>o.id===selected)
@@ -97,7 +135,7 @@ export default function ProductionSchedule() {
   return (
     <div className="sg">
       <div className="ph">
-        <div><h1>📅 Lịch Sản Xuất AI</h1><p>Tu dong lap lich · Quan ly nguon luc · Mo phong kich ban toi uu</p></div>
+        <div><h1>{tx.title}</h1><p>{tx.subtitle}</p></div>
         <div className="fl g8">
           <button className="btn btn-primary btn-sm">🤖 Toi uu lai lich</button>
           <button className="btn btn-outline btn-sm">📥 Xuat Excel</button>
@@ -105,10 +143,10 @@ export default function ProductionSchedule() {
       </div>
       <div className="sg4">
         {[
-          {label:'Don hang tuan 24',val:'7',sub:'3 dang san xuat',color:'#0078d4'},
-          {label:'Cong suat trung binh',val:'87%',sub:'Muc tieu: 90%',color:'#d97706'},
-          {label:'Nguy co tre deadline',val:'2',sub:'ORD-2611, ORD-2613',color:'#d13438'},
-          {label:'OEE Line 1 hom nay',val:'88%',sub:'3% so hom qua',color:'#107c10'},
+          {label:tx.kpi[0],val:'7',sub:tx.kpiSub[0],color:'#0078d4'},
+          {label:tx.kpi[1],val:'87%',sub:tx.kpiSub[1],color:'#d97706'},
+          {label:tx.kpi[2],val:'2',sub:tx.kpiSub[2],color:'#d13438'},
+          {label:tx.kpi[3],val:'88%',sub:tx.kpiSub[3],color:'#107c10'},
         ].map((s,i)=>(
           <div className="sc" key={i}>
             <div className="sc-label">{s.label}</div>
@@ -140,10 +178,10 @@ export default function ProductionSchedule() {
           </div>
           <div style={{display:'grid',gridTemplateColumns:'repeat(4,1fr)',gap:10,marginBottom:12}}>
             {[
-              {label:'Ke hoach',val:`${order.qty.toLocaleString()} chai`,color:'#0078d4'},
-              {label:'Da san xuat',val:`${order.done.toLocaleString()} chai`,color:'#107c10'},
-              {label:'Con lai',val:`${(order.qty-order.done).toLocaleString()} chai`,color:'#d97706'},
-              {label:'OEE',val:order.oee?`${order.oee}%`:'—',color:order.oee>=90?'#107c10':order.oee>0?'#d97706':'#aaa'},
+              {label:tx.lPlan,val:`${order.qty.toLocaleString()} chai`,color:'#0078d4'},
+              {label:tx.lDone,val:`${order.done.toLocaleString()} chai`,color:'#107c10'},
+              {label:tx.lRemain,val:`${(order.qty-order.done).toLocaleString()} chai`,color:'#d97706'},
+              {label:tx.lOEE,val:order.oee?`${order.oee}%`:'—',color:order.oee>=90?'#107c10':order.oee>0?'#d97706':'#aaa'},
             ].map((k,i)=>(
               <div key={i} style={{textAlign:'center',background:'var(--bg)',borderRadius:8,padding:'10px 8px',border:'1px solid var(--border)'}}>
                 <div style={{fontSize:11,color:'var(--text2)',marginBottom:4}}>{k.label}</div>
@@ -178,7 +216,7 @@ export default function ProductionSchedule() {
         </div>
       )}
       <div className="tabs">
-        {['Lich Gantt','Danh sach don','Nguon luc & OEE','Mo phong kich ban'].map((t,i)=>(
+        {tx.jsTabs.map((t,i)=>(
           <div key={i} className={`tab ${tab===i?'active':''}`} onClick={()=>setTab(i)}>{t}</div>
         ))}
       </div>
@@ -220,7 +258,7 @@ export default function ProductionSchedule() {
         <div className="card">
           <div className="card-title"><span className="card-title-left">📋 Danh sach don hang – Tuan 24</span></div>
           <div className="tw"><table>
-            <thead><tr><th>Ma DH</th><th>San pham</th><th>So luong</th><th>Tien do</th><th>Deadline</th><th>Uu tien</th><th>Trang thai</th><th>Line</th><th>OEE</th></tr></thead>
+            <thead><tr><th>{tx.thOrder}</th><th>{tx.thProduct}</th><th>{tx.thQty}</th><th>{tx.thProgress}</th><th>{tx.thDeadline}</th><th>{tx.thPriority}</th><th>{tx.thStatus}</th><th>{tx.thLine}</th><th>{tx.thOEE}</th></tr></thead>
             <tbody>{orders.map((o,i)=>(
               <tr key={i} onClick={()=>setSelected(o.id===selected?null:o.id)} style={{cursor:'pointer',background:o.id===selected?'#e8f4fd':undefined}}>
                 <td className="tb fw5">{o.id}</td><td className="fw5">{o.product}</td>
@@ -275,7 +313,7 @@ export default function ProductionSchedule() {
         <div className="card">
           <div className="card-title"><span className="card-title-left">🔮 Mo phong kich ban dieu chinh</span></div>
           <div className="tw mb12"><table>
-            <thead><tr><th>Kich ban</th><th>Hieu suat</th><th>Don nguy co tre</th><th>Chi phi</th><th>Rui ro</th><th>AI de xuat</th></tr></thead>
+            <thead><tr><th>{tx.thScenario}</th><th>{tx.thEff}</th><th>{tx.thRisk}</th><th>{tx.thCost}</th><th>{tx.thRiskLevel}</th><th>{tx.thAI}</th></tr></thead>
             <tbody>{simulate.map((s,i)=>(
               <tr key={i} style={{background:i===1?'#107c1008':undefined}}>
                 <td className="fw5">{s.scenario}</td>

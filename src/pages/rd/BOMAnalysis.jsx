@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { useLang } from '../../i18n/context'
 
 const boms = [
   {
@@ -54,7 +55,44 @@ const history = [
   {date:'03/01/2025',bom:'BOM-NC-CAM-330-VN-v1',user:'Hệ thống',type:'Khởi tạo',desc:'Nhập BOM gốc từ tài liệu giấy vào hệ thống. Version đầu tiên được số hóa.'},
 ]
 
+const T = {
+  vi: {
+    title: '📑 Quản Lý & Phân Tích BOM',
+    subtitle: 'Single Source of Truth cho công thức – Tra cứu, so sánh phiên bản BOM, lịch sử thay đổi và AI hỗ trợ',
+    tabs: ['📋 Chi tiết BOM', '📜 Lịch sử thay đổi', '📊 So sánh phiên bản', '🤖 AI hỗ trợ'],
+    kpi: ['Tổng số BOM đang quản lý','BOM đang hiện hành','Thay đổi tháng này','Thành phần theo dõi'],
+    kpiSub: ['5 sản phẩm · 4 thị trường','6 đã lưu trữ','Chờ phê duyệt: 1','Nguyên liệu + Bao bì'],
+    innerTabs: ['Thành phần BOM','Lịch sử thay đổi','AI Tra cứu','So sánh phiên bản'],
+    lProduct: 'Sản phẩm',
+    lMarket: 'Thị trường',
+    lRegion: 'Khu vực SX',
+    lVersion: 'Phiên bản',
+    lDate: 'Ngày tạo',
+    lCustomer: 'Khách hàng',
+    lStatus: 'Trạng thái',
+    lLines: 'Số dòng BOM',
+  },
+  zh: {
+    title: '📑 BOM管理与分析',
+    subtitle: '配方的唯一数据源 – 查询、比较BOM版本、变更历史和AI支持',
+    tabs: ['📋 BOM详情', '📜 变更历史', '📊 版本对比', '🤖 AI支持'],
+    kpi: ['管理中的BOM总数','现行BOM','本月变更','跟踪成分数'],
+    kpiSub: ['5个产品 · 4个市场','6个已归档','待审批: 1','原料+包装'],
+    innerTabs: ['BOM成分','变更历史','AI查询','版本对比'],
+    lProduct: '产品',
+    lMarket: '市场',
+    lRegion: '生产区域',
+    lVersion: '版本',
+    lDate: '创建日期',
+    lCustomer: '客户',
+    lStatus: '状态',
+    lLines: 'BOM行数',
+  },
+}
+
 export default function BOMAnalysis() {
+  const { lang } = useLang()
+  const tx = T[lang] || T.vi
   const [selected, setSelected] = useState(boms[0])
   const [tab, setTab] = useState(0)
   const [search, setSearch] = useState('')
@@ -93,7 +131,7 @@ export default function BOMAnalysis() {
   return (
     <div className="sg">
       <div className="ph">
-        <div><h1>📑 Quản Lý & Phân Tích BOM</h1><p>Single Source of Truth cho công thức – Tra cứu, so sánh phiên bản BOM, lịch sử thay đổi và AI hỗ trợ</p></div>
+        <div><h1>{tx.title}</h1><p>{tx.subtitle}</p></div>
         <div className="fl g8">
           <button className="btn btn-primary btn-sm">+ Tạo BOM mới</button>
           <button className="btn btn-outline btn-sm">📥 Import Excel</button>
@@ -102,10 +140,10 @@ export default function BOMAnalysis() {
 
       <div className="sg4">
         {[
-          {label:'Tổng số BOM đang quản lý',val:'24',sub:'5 sản phẩm · 4 thị trường',color:'#0078d4'},
-          {label:'BOM đang hiện hành',val:'18',sub:'6 đã lưu trữ',color:'#107c10'},
-          {label:'Thay đổi tháng này',val:'3',sub:'Chờ phê duyệt: 1',color:'#d97706'},
-          {label:'Thành phần theo dõi',val:'48',sub:'Nguyên liệu + Bao bì',color:'#00897b'},
+          {label:tx.kpi[0],val:'24',sub:tx.kpiSub[0],color:'#0078d4'},
+          {label:tx.kpi[1],val:'18',sub:tx.kpiSub[1],color:'#107c10'},
+          {label:tx.kpi[2],val:'3',sub:tx.kpiSub[2],color:'#d97706'},
+          {label:tx.kpi[3],val:'48',sub:tx.kpiSub[3],color:'#00897b'},
         ].map((s,i)=>(
           <div className="sc" key={i}>
             <div className="sc-label">{s.label}</div>
@@ -159,14 +197,14 @@ export default function BOMAnalysis() {
             </div>
             <div className="fg4 mb12" style={{gridTemplateColumns:'repeat(4,1fr)'}}>
               {[
-                {label:'Sản phẩm',val:selected.product},
-                {label:'Thị trường',val:selected.market},
-                {label:'Khu vực SX',val:selected.region},
-                {label:'Phiên bản',val:selected.version},
-                {label:'Ngày tạo',val:selected.date},
-                {label:'Khách hàng',val:selected.customer},
-                {label:'Trạng thái',val:selected.status},
-                {label:'Số dòng BOM',val:selected.lines.length||'—'},
+                {label:tx.lProduct,val:selected.product},
+                {label:tx.lMarket,val:selected.market},
+                {label:tx.lRegion,val:selected.region},
+                {label:tx.lVersion,val:selected.version},
+                {label:tx.lDate,val:selected.date},
+                {label:tx.lCustomer,val:selected.customer},
+                {label:tx.lStatus,val:selected.status},
+                {label:tx.lLines,val:selected.lines.length||'—'},
               ].map((f,i)=>(
                 <div key={i} style={{background:'var(--bg)',padding:'8px 10px',borderRadius:6}}>
                   <div style={{fontSize:10.5,color:'var(--muted)',fontWeight:500}}>{f.label}</div>
@@ -176,7 +214,7 @@ export default function BOMAnalysis() {
             </div>
 
             <div className="tabs" style={{marginBottom:14}}>
-              {['Thành phần BOM','Lịch sử thay đổi','AI Tra cứu','So sánh phiên bản'].map((t,i)=>(
+              {tx.innerTabs.map((t,i)=>(
                 <div key={i} className={`tab ${tab===i?'active':''}`} onClick={()=>setTab(i)}>{t}</div>
               ))}
             </div>

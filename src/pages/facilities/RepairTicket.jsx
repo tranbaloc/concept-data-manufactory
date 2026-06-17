@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { useLang } from '../../i18n/context'
 
 const tickets = [
   {id:'RT-2406-041',time:'08:15',reporter:'Nguyễn Văn An',area:'Line 1 – Máy chiết',desc:'Máy chiết MX-01 phát ra tiếng kêu lạ khi vận hành, tốc độ giảm ~10%',priority:'Cao',category:'Cơ khí',assignTo:'Trần Bảo Trì',estTime:'2h',status:'Đang xử lý',aiNote:'Khả năng cao: ổ bi con lăn băng tải mòn. Xem hồ sơ bảo trì tháng 3.'},
@@ -18,7 +19,50 @@ const staff = [
 
 const [statDone, statPending, statInProgress] = [2, 1, 2]
 
+const T = {
+  vi: {
+    title: '🛠️ Báo Sửa Chữa Thông Minh',
+    subtitle: 'AI tự động phân loại phiếu báo sửa, dự báo thời gian xử lý, phân công kỹ thuật viên phù hợp',
+    tabs: ['🛠️ Phiếu hôm nay', '📋 Lịch sử', '📊 Thống kê'],
+    kpi: ['Phiếu hôm nay','Đang xử lý','Hoàn thành hôm nay','Chờ phụ tùng'],
+    kpiSub: ['2 mức cao','Trung bình 2.5h/phiếu','Đúng SLA: 100%','ETA: chiều nay'],
+    outerTabs: ['🛠️ Phiếu hôm nay','📋 Lịch sử','📊 Thống kê'],
+    lArea: 'Khu vực',
+    lCategory: 'Phân loại AI',
+    lAssign: 'Phân công',
+    lETA: 'Thời gian dự kiến',
+    thId: 'Mã phiếu',
+    thEquip: 'Thiết bị',
+    thPriority: 'Mức độ',
+    thStatus: 'Trạng thái',
+    thAssign: 'Phân công',
+    thTime: 'Thời gian',
+    jsTabs: ['Danh sách phiếu','Phân công nhân sự','Thống kê SLA'],
+  },
+  zh: {
+    title: '🛠️ 智能报修',
+    subtitle: 'AI自动分类报修单，预测处理时间，分配合适的技术员',
+    tabs: ['🛠️ 今日工单', '📋 历史记录', '📊 统计'],
+    kpi: ['今日工单','处理中','今日完成','等待零件'],
+    kpiSub: ['2件高优','平均2.5h/单','SLA达成: 100%','ETA: 今天下午'],
+    outerTabs: ['🛠️ 今日工单','📋 历史记录','📊 统计'],
+    lArea: '区域',
+    lCategory: 'AI分类',
+    lAssign: '分配给',
+    lETA: '预计时间',
+    thId: '工单编号',
+    thEquip: '设备',
+    thPriority: '优先级',
+    thStatus: '状态',
+    thAssign: '分配',
+    thTime: '时间',
+    jsTabs: ['工单列表','人员分配','SLA统计'],
+  },
+}
+
 export default function RepairTicket() {
+  const { lang } = useLang()
+  const tx = T[lang] || T.vi
   const [tab, setTab] = useState(0)
   const [selected, setSelected] = useState(tickets[0])
   const [showForm, setShowForm] = useState(false)
@@ -30,16 +74,16 @@ export default function RepairTicket() {
   return (
     <div className="sg">
       <div className="ph">
-        <div><h1>🛠️ Báo Sửa Chữa Thông Minh</h1><p>AI tự động phân loại phiếu báo sửa, dự báo thời gian xử lý, phân công kỹ thuật viên phù hợp</p></div>
+        <div><h1>{tx.title}</h1><p>{tx.subtitle}</p></div>
         <button className="btn btn-primary" onClick={()=>setShowForm(!showForm)}>+ Tạo phiếu báo sửa</button>
       </div>
 
       <div className="sg4">
         {[
-          {label:'Phiếu hôm nay',val:'5',sub:'2 mức cao',color:'#d97706'},
-          {label:'Đang xử lý',val:'2',sub:'Trung bình 2.5h/phiếu',color:'#0078d4'},
-          {label:'Hoàn thành hôm nay',val:'2',sub:'Đúng SLA: 100%',color:'#107c10'},
-          {label:'Chờ phụ tùng',val:'1',sub:'ETA: chiều nay',color:'#d13438'},
+          {label:tx.kpi[0],val:'5',sub:tx.kpiSub[0],color:'#d97706'},
+          {label:tx.kpi[1],val:'2',sub:tx.kpiSub[1],color:'#0078d4'},
+          {label:tx.kpi[2],val:'2',sub:tx.kpiSub[2],color:'#107c10'},
+          {label:tx.kpi[3],val:'1',sub:tx.kpiSub[3],color:'#d13438'},
         ].map((s,i)=>(
           <div className="sc" key={i}>
             <div className="sc-label">{s.label}</div>
@@ -87,7 +131,7 @@ export default function RepairTicket() {
       )}
 
       <div className="tabs">
-        {['Danh sách phiếu','Phân công nhân sự','Thống kê SLA'].map((t,i)=>(
+        {tx.jsTabs.map((t,i)=>(
           <div key={i} className={`tab ${tab===i?'active':''}`} onClick={()=>setTab(i)}>{t}</div>
         ))}
       </div>
@@ -127,10 +171,10 @@ export default function RepairTicket() {
                   <div style={{fontSize:13}}>{selected.desc}</div>
                 </div>
                 {[
-                  {label:'Khu vực',val:selected.area},
-                  {label:'Phân loại AI',val:selected.category},
-                  {label:'Phân công',val:selected.assignTo},
-                  {label:'Thời gian dự kiến',val:selected.estTime},
+                  {label:tx.lArea,val:selected.area},
+                  {label:tx.lCategory,val:selected.category},
+                  {label:tx.lAssign,val:selected.assignTo},
+                  {label:tx.lETA,val:selected.estTime},
                 ].map((f,i)=>(
                   <div key={i} className="fl ic jb" style={{padding:'5px 0',borderBottom:'1px solid var(--border)'}}>
                     <span className="cm tsm">{f.label}</span>

@@ -1,3 +1,4 @@
+import { useLang } from '../i18n/context'
 /**
  * FormsPanel — sticky right sidebar listing all forms for a step.
  * Props:
@@ -5,6 +6,7 @@
  *   onOpen: (form) => void  — called when user clicks a form row
  */
 export default function FormsPanel({ forms = [], onOpen }) {
+  const { t } = useLang()
   return (
     <div style={{
       width: 210,
@@ -32,7 +34,7 @@ export default function FormsPanel({ forms = [], onOpen }) {
           alignItems: 'center',
           gap: 6,
         }}>
-          📋 Biểu Mẫu
+          {t('common.allForms')}
         </div>
 
         {/* Form list */}
@@ -74,7 +76,7 @@ export default function FormsPanel({ forms = [], onOpen }) {
 
         {/* Footer hint */}
         <div style={{ padding: '6px 12px 8px', fontSize: 10, color: 'var(--muted)', borderTop: '1px solid var(--border)' }}>
-          Click để xem · Kéo/In PDF trong cửa sổ xem
+          {t('common.formHint')}
         </div>
       </div>
     </div>

@@ -1,22 +1,44 @@
 import { useState } from 'react'
+import { useLang } from '../../i18n/context'
 const samples = [
   {type:'zalo',zh:'今天下午3点前需要确认订单数量，请尽快回复。',vn:'Cần xác nhận số lượng đơn hàng trước 3 giờ chiều hôm nay, vui lòng phản hồi sớm nhất.'},
   {type:'order',zh:'产品编号: NC-CAM-330ML, 数量: 50,000 箱, 交货日期: 2026年6月20日',vn:'Mã sản phẩm: NC-CAM-330ML, Số lượng: 50.000 thùng, Ngày giao hàng: 20/06/2026'},
   {type:'meeting',zh:'会议议题：讨论六月份的包材需求和库存调整方案。',vn:'Nội dung họp: Thảo luận nhu cầu bao bì và phương án điều chỉnh tồn kho tháng 6.'},
 ]
 
+const T = {
+  vi: {
+    title: '🌐 Dịch Thuật AI',
+    subtitle: 'Dịch tin nhắn Zalo, nội dung họp, đơn hàng tiếng Hoa – Giảm thời gian phiên dịch',
+    translateBtn: '🌐 Dịch ngay',
+    historyCard: '📋 Lịch sử dịch hôm nay',
+    thTime: 'Thời gian', thType: 'Loại', thContent: 'Nội dung gốc (tóm tắt)', thAccuracy: 'Độ tin cậy',
+    kpi: ['Tin nhắn đã dịch hôm nay','Thời gian tiết kiệm TB','Độ chính xác trung bình'],
+  },
+  zh: {
+    title: '🌐 AI翻译',
+    subtitle: '翻译Zalo消息、会议内容、中文订单 – 节省翻译时间',
+    translateBtn: '🌐 立即翻译',
+    historyCard: '📋 今日翻译历史',
+    thTime: '时间', thType: '类型', thContent: '原文（摘要）', thAccuracy: '置信度',
+    kpi: ['今日已翻译消息','平均节省时间','平均准确率'],
+  },
+}
+
 export default function Translation() {
+  const { lang } = useLang()
+  const tx = T[lang] || T.vi
   const [tab, setTab] = useState(0)
   const [input, setInput] = useState('')
   const [result, setResult] = useState('')
   const [loading, setLoading] = useState(false)
-  const [lang, setLang] = useState('zh-vn')
+  const [targetLang, setTargetLang] = useState('zh-vn')
 
   const translate = () => {
     if (!input.trim()) return
     setLoading(true)
     setTimeout(() => {
-      setResult('【AI Dịch】 ' + (lang==='zh-vn'
+      setResult('【AI Dịch】 ' + (targetLang==='zh-vn'
         ? 'Đây là bản dịch tiếng Việt mẫu cho nội dung bạn vừa nhập. Hệ thống nhận diện đây là nội dung đơn hàng với thông tin sản phẩm, số lượng và thời gian giao hàng.'
         : 'This is a sample English translation for the content you just entered.'))
       setLoading(false)
@@ -25,12 +47,12 @@ export default function Translation() {
 
   return (
     <div className="sg">
-      <div className="ph"><div><h1>🌐 Dịch Thuật AI</h1><p>Dịch tin nhắn Zalo, nội dung họp, đơn hàng tiếng Hoa – Giảm thời gian phiên dịch</p></div></div>
+      <div className="ph"><div><h1>{tx.title}</h1><p>{tx.subtitle}</p></div></div>
       <div className="sg3">
         {[
-          {label:'Tin nhắn đã dịch hôm nay',val:'47',color:'#0078d4'},
-          {label:'Thời gian tiết kiệm TB',val:'3.2 phút/tin',color:'#107c10'},
-          {label:'Độ chính xác trung bình',val:'97.4%',color:'#00897b'},
+          {label:tx.kpi[0],val:'47',color:'#0078d4'},
+          {label:tx.kpi[1],val:'3.2 phút/tin',color:'#107c10'},
+          {label:tx.kpi[2],val:'97.4%',color:'#00897b'},
         ].map((s,i)=><div className="sc" key={i}><div className="sc-label">{s.label}</div><div className="sc-value" style={{color:s.color}}>{s.val}</div></div>)}
       </div>
       <div className="tabs">
@@ -41,7 +63,7 @@ export default function Translation() {
           <div className="card">
             <div className="card-title"><span className="card-title-left">📝 Nhập nội dung cần dịch</span></div>
             <div className="fr mb12"><label>Chiều dịch</label>
-              <select value={lang} onChange={e=>setLang(e.target.value)}>
+              <select value={targetLang} onChange={e=>setTargetLang(e.target.value)}>
                 <option value="zh-vn">🇨🇳 Tiếng Hoa → 🇻🇳 Tiếng Việt</option>
                 <option value="vn-en">🇻🇳 Tiếng Việt → 🇬🇧 Tiếng Anh</option>
                 <option value="en-vn">🇬🇧 Tiếng Anh → 🇻🇳 Tiếng Việt</option>
@@ -78,7 +100,7 @@ export default function Translation() {
         <div className="card">
           <div className="card-title"><span className="card-title-left">📂 Lịch sử dịch hôm nay</span></div>
           <div className="tw"><table>
-            <thead><tr><th>Thời gian</th><th>Loại</th><th>Nội dung gốc (tóm tắt)</th><th>Độ tin cậy</th></tr></thead>
+            <thead><tr><th>{tx.thTime}</th><th>{tx.thType}</th><th>{tx.thContent}</th><th>{tx.thAccuracy}</th></tr></thead>
             <tbody>
               {[['08:12','Zalo','今天下午3点前需要确认订单...','98%'],['09:45','Đơn hàng','产品编号: NC-CAM-330ML...','99%'],
                 ['10:30','Họp','会议议题：讨论六月份的...','96%'],['13:20','Zalo','请确认明天的发货数量...','97%'],

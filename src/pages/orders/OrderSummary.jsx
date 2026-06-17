@@ -2,6 +2,7 @@ import { useState } from 'react'
 import PDFDrawer from '../../components/PDFDrawer'
 import FormsPanel from '../../components/FormsPanel'
 import { useNavigate } from 'react-router-dom'
+import { useLang } from '../../i18n/context'
 
 
 function StepBar({ active }) {
@@ -32,7 +33,24 @@ function StepBar({ active }) {
 const FORMS = [
     {code:'P-RS1 002-06.01', label:'Phân Tích Đơn Hàng', file:'/forms/P-RS1-002-06.01.pdf'}
   ]
+const T = {
+  vi: {
+    title: '📋 Bước 2 – Tổng Hợp & Phân Tích Đơn Hàng',
+    subtitle: 'Biểu mẫu P-RS1 002-06.01 – Bảng Đề Xuất Thay Đổi Công Trình / Phân Tích Nguyên Nhân Đơn Mới',
+    submit: '✅ Gửi Phân Tích',
+    next: '→ Bước 3: R&D Sample',
+  },
+  zh: {
+    title: '📋 步骤2 – 汇总与分析订单',
+    subtitle: '表单 P-RS1 002-06.01 – 工程变更提案 / 新订单原因分析',
+    submit: '✅ 提交分析',
+    next: '→ 步骤3：R&D样品',
+  },
+}
+
 export default function OrderSummary() {
+  const { lang } = useLang()
+  const tx = T[lang] || T.vi
   const navigate = useNavigate()
 const [pdf, setPdf] = useState(null)
     const [submitted, setSubmitted] = useState(false)
@@ -53,8 +71,8 @@ const [pdf, setPdf] = useState(null)
       <div className="sg" style={{flex:1}}>
       <div className="ph">
         <div>
-          <h1>📋 Bước 2 – Tổng Hợp & Phân Tích Đơn Hàng</h1>
-          <p>Biểu mẫu P-RS1 002-06.01 – Bảng Đề Xuất Thay Đổi Công Trình / Phân Tích Nguyên Nhân Đơn Mới</p>
+          <h1>{tx.title}</h1>
+          <p>{tx.subtitle}</p>
         </div>
         <div className="badge badge-yellow">Đơn: EM-2026-0614</div>
       </div>

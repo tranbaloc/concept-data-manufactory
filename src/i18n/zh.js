@@ -1,0 +1,159 @@
+export default {
+  // ── Topbar ──────────────────────────────────────────────
+  topbar: {
+    platform: 'GIAVICO AI 平台',
+    orderFlow: '📦 订单流程',
+    month: '月',
+    year: '2026年',
+  },
+
+  // ── Sidebar nav labels ───────────────────────────────────
+  nav: {
+    overview: '总览',
+    architecture: '系统架构',
+
+    sectionOrder: '📦 订单流程',
+    pipeline: '流程总览',
+    inbox: '① 接收订单邮件',
+    summary: '② 汇总与分析',
+    sampleReport: '③ R&D 样品报告',
+    newProductNotice: '④ 生产通知',
+    acceptanceSpecs: '⑤ 验收规格',
+    productConfirm: '⑥ 产品确认',
+    productionOrder: '⑦ 生产指令',
+    engineeringChange: '🔄 工程变更',
+
+    sectionRD: 'R&D – 研究与开发',
+    formulaGen: 'AI 配方生成',
+    batchCalc: '批量计算',
+    formulaCompare: '配方比较',
+    bom: 'BOM 管理',
+
+    sectionPlanning: '生产计划',
+    schedule: '生产排程',
+
+    sectionFacilities: '设备与生产',
+    equipment: '设备维护',
+    energy: '能源管理',
+    production: '生产支持',
+    safety: '安全与风险',
+    repair: '报修',
+    knowledge: '文档与知识库',
+
+    sectionWarehouse: '仓库管理',
+    translation: 'AI 翻译',
+    reconciliation: 'Excel 对账',
+    inventory: '库存管理',
+    workhour: '工时计算',
+    packaging: '包装跟踪',
+    statistics: '综合统计',
+
+    sectionManagement: '管理',
+    delivery: '交货日期计算',
+  },
+
+  // ── Page titles (topbar breadcrumb) ─────────────────────
+  pageTitles: {
+    '/dashboard': '总览',
+    '/architecture': '系统架构',
+    '/orders/pipeline': '订单流程总览',
+    '/orders/inbox': '步骤1 – 接收订单邮件',
+    '/orders/summary': '步骤2 – 汇总与分析',
+    '/orders/sample-report': '步骤3 – R&D 样品报告',
+    '/orders/new-product-notice': '步骤4 – 生产通知',
+    '/orders/acceptance-specs': '步骤5 – 验收规格',
+    '/orders/product-confirm': '步骤6 – 产品确认',
+    '/orders/production-order': '步骤7 – 生产指令',
+    '/rd/formula-gen': 'AI 配方生成',
+    '/rd/batch-calc': '批量计算',
+    '/rd/formula-compare': '配方比较',
+    '/rd/bom': 'BOM 管理',
+    '/planning/schedule': '生产排程',
+    '/facilities/equipment': '设备维护',
+    '/facilities/energy': '能源管理',
+    '/facilities/production': '生产支持',
+    '/facilities/safety': '安全与风险',
+    '/facilities/repair': '智能报修',
+    '/facilities/knowledge': '文档与知识库',
+    '/warehouse/translation': 'AI 翻译',
+    '/warehouse/reconciliation': 'Excel 对账',
+    '/warehouse/inventory': '库存管理',
+    '/warehouse/workhour': '工时计算',
+    '/warehouse/packaging': '包装跟踪',
+    '/warehouse/statistics': '综合数据统计',
+    '/management/delivery': '交货日期计算',
+  },
+
+  // ── Dashboard ────────────────────────────────────────────
+  dashboard: {
+    title: 'AI 系统总览',
+    subtitle: 'Giavico AI 平台 · 更新时间：',
+    systemStable: '系统运行正常',
+
+    kpi: {
+      activeUsers: '活跃用户',
+      activeUsersSub: '▲ +12 较上月',
+      aiRequests: '今日 AI 请求',
+      aiRequestsSub: '峰值 14:00–15:00（210次）',
+      activeModules: '运行模块',
+      responseTime: '平均响应时间',
+      responseTimeSub: '▼ 较2026年1月降低33%',
+      testing: '测试中',
+    },
+
+    charts: {
+      deptEfficiency: '📈 各部门使用效率（%）',
+      hourlyRequests: '📊 今日各时段请求量',
+      requestByDept: '🍩 各部门请求分布',
+      responseTimeTrend: '⏱️ 响应时间趋势（秒）',
+      hourlyNote: '橙线 = 高负载阈值（150次/小时）',
+      responseTrendNote: '▼ 从1.8s降至1.2s（–33%），历时6个月',
+      target: '目标',
+    },
+
+    modules: {
+      title: '📋 模块状态',
+      dept: '部门',
+      module: '模块',
+      status: '状态',
+      users: '用户数',
+      reqMonth: '月请求数',
+      vsPrev: '较上月',
+      uptime: '运行率',
+      goto: '前往',
+      all: '全部',
+      active: '使用中',
+      testing: '测试中',
+    },
+
+    alerts: {
+      title: '🚨 警报与通知',
+    },
+    activity: {
+      title: '🕒 最近活动',
+    },
+  },
+
+  // ── Common / shared ──────────────────────────────────────
+  common: {
+    forms: '表单：',
+    viewPDF: '⬇ 下载 PDF',
+    closePDF: '✕',
+    allForms: '📋 表单',
+    formHint: '点击查看 · 在预览窗口中拖动/打印',
+    statusActive: '使用中',
+    statusTesting: '测试中',
+    approve: '审批',
+    reject: '拒绝',
+    save: '保存',
+    export: '导出',
+    print: '打印',
+    search: '搜索',
+    filter: '筛选',
+    all: '全部',
+    back: '返回',
+    next: '下一步',
+    confirm: '确认',
+    cancel: '取消',
+  },
+}

@@ -95,6 +95,8 @@ function PipelineNode({ data }) {
 
 function AIGroupNode({ data }) {
   const navigate = useNavigate()
+  const { lang } = useLang()
+  const tx = T[lang] || T.vi
   const [hov, setHov] = useState(null)
   const pal = C[data.pal]
   return (

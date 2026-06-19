@@ -8,8 +8,8 @@ import { useLang } from '../../i18n/context'
 
 function StepBar({ active }) {
   const steps = [
-    ['1','📧','Nhận Email'],['2','📋','Tổng Hợp'],['3','🧪','R&D Sample'],
-    ['4','📄','Thông Báo CB'],['5','✅','Quy Cách NT'],['6','🤝','Xác Nhận SP'],['7','🏭','Lệnh SX'],
+    ['1','📋','Đơn Mẫu'],['2','📦','Gửi Mẫu'],['3','📄','COA'],
+    ['4','🧪','Báo Cáo R&D'],['5','✅','XNQC'],['6','📑','Tiêu Chuẩn'],['7','🤝','Họp Thỏa Thuận'],
   ]
   return (
     <div className="card" style={{padding:'12px 20px'}}>
@@ -32,12 +32,12 @@ function StepBar({ active }) {
 
 
 const FORMS = [
-    {code:'P-RS1 001-02.02', label:'NT Thành Phẩm', file:'/forms/P-RS1-001-02.02.pdf'},
-    {code:'P-RS1 003-09.03', label:'NT Bán Thành Phẩm', file:'/forms/P-RS1-003-09.03.pdf'},
-    {code:'P-RS1 003-03.02', label:'NT Nguyên Liệu', file:'/forms/P-RS1-003-03.02.pdf'},
-    {code:'P-RS1 003-10.01', label:'Ký Nhận BTP', file:'/forms/P-RS1-003-10.01.pdf'},
-    {code:'P-RS1 002-04.01', label:'Ký Nhận QC SP', file:'/forms/P-RS1-002-04.01.pdf'}
-  ]
+  {n:12, code:'表P-RS1 001-02 02', label:'成品允收規格表', file:'/forms/P-RS1-001-02.02.pdf'},
+  {n:13, code:'表P-RS1 003-09 03', label:'半成品允收標準表單 - Bang quy cach nghiem thu ban thanh pham', file:'/forms/P-RS1-003-09.03.pdf'},
+  {n:14, code:'表P-RS1 003-03 02', label:'原料允收標準表單 - Bang qui cach nghiem thu nguyen lieu', file:'/forms/P-RS1-003-03.02.pdf'},
+  {n:5,  code:'表P-RS1 003-10.01', label:'半成品允收規格表回收簽收單 - Bang ky nhan va thu hoi bang quy cach nghiem thu BTP', file:'/forms/P-RS1-003-10.01.pdf'},
+  {n:6,  code:'表P-RS1 002-04 01', label:'〝新產品規格說明單〞回收簽收單', file:'/forms/P-RS1-002-04.01.pdf'},
+]
 const T = {
   vi: {
     title: '✅ Bước 5 – Bảng Quy Cách Nghiệm Thu',

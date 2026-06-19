@@ -37,6 +37,12 @@ export default function FormsBanner({ forms, onOpen }) {
               whiteSpace: 'nowrap',
             }}
           >
+            {f.n != null && (
+              <span style={{
+                background: '#e8f3ff', color: '#0078d4',
+                borderRadius: 3, padding: '0 4px', fontSize: 10, fontWeight: 700, marginRight: 2
+              }}>Mẫu {f.n}</span>
+            )}
             {f.code}
           </button>
         )

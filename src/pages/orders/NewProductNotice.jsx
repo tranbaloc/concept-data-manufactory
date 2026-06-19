@@ -8,8 +8,8 @@ import { useLang } from '../../i18n/context'
 
 function StepBar({ active }) {
   const steps = [
-    ['1','📧','Nhận Email'],['2','📋','Tổng Hợp'],['3','🧪','R&D Sample'],
-    ['4','📄','Thông Báo CB'],['5','✅','Quy Cách NT'],['6','🤝','Xác Nhận SP'],['7','🏭','Lệnh SX'],
+    ['1','📋','Đơn Mẫu'],['2','📦','Gửi Mẫu'],['3','📄','COA'],
+    ['4','🧪','Báo Cáo R&D'],['5','✅','XNQC'],['6','📑','Tiêu Chuẩn'],['7','🤝','Họp Thỏa Thuận'],
   ]
   return (
     <div className="card" style={{padding:'12px 20px'}}>
@@ -32,10 +32,14 @@ function StepBar({ active }) {
 
 
 const FORMS = [
-    {code:'P-RS1 001-01.02', label:'Thông Báo Chế Biến SP', file:'/forms/P-RS1-001-01.02.pdf'},
-    {code:'P-RS1 001-03.02', label:'Quy Cách SP Mới', file:'/forms/P-RS1-001-03.02.pdf'},
-    {code:'P-RS1 002-02.02', label:'Ký Nhận & Thu Hồi TB', file:'/forms/P-RS1-002-02.02.pdf'}
-  ]
+  {n:10, code:'表P-RS1 001-01.02', label:'新產品製造通知單 - Bang thong bao che bien san pham', file:'/forms/P-RS1-001-01.02.pdf'},
+  {n:11, code:'表P-RS1 001-03.02', label:'新產品規格說明書', file:'/forms/P-RS1-001-03.02.pdf'},
+  {n:12, code:'表P-RS1 001-02 02', label:'成品允收規格表', file:'/forms/P-RS1-001-02.02.pdf'},
+  {n:13, code:'表P-RS1 003-09 03', label:'半成品允收標準表單 - Bang quy cach nghiem thu ban thanh pham', file:'/forms/P-RS1-003-09.03.pdf'},
+  {n:14, code:'表P-RS1 003-03 02', label:'原料允收標準表單 - Bang qui cach nghiem thu nguyen lieu', file:'/forms/P-RS1-003-03.02.pdf'},
+  {n:15, code:'表P-RS1 001-07 02', label:'Giavico國際廠產品代號編碼原則 (Chinese) 20240311', file:'/forms/P-RS1-001-07.02-ZH.pdf'},
+  {n:16, code:'表P-RS1 001-07 02', label:'Giavico國際廠產品代號編碼原則 (Vietnam) 20240311', file:'/forms/P-RS1-001-07.02-VI.pdf'},
+]
 const T = {
   vi: {
     title: '📄 Bước 4 – Thông Báo Chế Biến & Quy Cách Sản Phẩm Mới',

@@ -61,11 +61,20 @@ export default function FormsPanel({ forms = [], onOpen }) {
             >
               <span style={{ fontSize: 13, flexShrink: 0 }}>📄</span>
               <div style={{ minWidth: 0 }}>
-                <div style={{ fontSize: 11.5, fontWeight: 600, color: 'var(--blue)', lineHeight: 1.3 }}>
+                {f.n != null && (
+                  <div style={{ marginBottom: 2 }}>
+                    <span style={{
+                      background: '#e8f3ff', color: '#0078d4',
+                      borderRadius: 4, padding: '1px 5px',
+                      fontSize: 10, fontWeight: 700,
+                    }}>Mẫu {f.n}</span>
+                  </div>
+                )}
+                <div style={{ fontSize: 11, fontWeight: 600, color: 'var(--blue)', lineHeight: 1.3, wordBreak: 'break-all' }}>
                   {f.code}
                 </div>
                 {f.label && (
-                  <div style={{ fontSize: 10.5, color: 'var(--muted)', marginTop: 1, lineHeight: 1.3, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                  <div style={{ fontSize: 10.5, color: 'var(--muted)', marginTop: 2, lineHeight: 1.4 }}>
                     {f.label}
                   </div>
                 )}

@@ -111,10 +111,14 @@ function ChangeTable({ readOnly = false }) {
 
 // ── FORMS sidebar ────────────────────────────────────────────────────────────
 const FORMS = [
-  {code:'P-RS1 002-01.07', label:'Mẫu 3 – Đề Xuất Thay Đổi', file:'/forms/P-RS1-002-01.07.pdf'},
-  {code:'P-RS1 002-07.03', label:'Mẫu 9 – TB Thay Đổi QT', file:'/forms/P-RS1-002-07.03.pdf'},
-  {code:'P-RS1 002-05.04', label:'Mẫu 2 – Engineering Change Notice', file:'/forms/P-RS1-002-05.04.pdf'},
-  {code:'P-RS1 002-03.02', label:'Mẫu 7 – Thu Hồi TB Cũ', file:'/forms/P-RS1-002-03.02.pdf'},
+  {n:2, code:'表P-RS1 002-05.04', label:'工程變更通知單 - Bang thay doi qui trinh va phuong thuc', file:'/forms/P-RS1-002-05.04.pdf'},
+  {n:3, code:'表P-RS1 002-01.07', label:'製程、配方、規格提議更改單 - Bang de xuat thay doi qui trinh phuong thuc va qui cach', file:'/forms/P-RS1-002-01.07.pdf'},
+  {n:4, code:'表P-RS1 002-06.01', label:'工程變更申請單-新增表單 - Bang de xuat thay doi cong trinh', file:'/forms/P-RS1-002-06.01.pdf'},
+  {n:5, code:'表P-RS1 003-10.01', label:'半成品允收規格表回收簽收單 - Bang ky nhan va thu hoi bang quy cach nghiem thu BTP', file:'/forms/P-RS1-003-10.01.pdf'},
+  {n:6, code:'表P-RS1 002-04 01', label:'〝新產品規格說明單〞回收簽收單', file:'/forms/P-RS1-002-04.01.pdf'},
+  {n:7, code:'表P-RS1 002-03.02', label:'產品支撐配方規格更改通知單回收簽單', file:'/forms/P-RS1-002-03.02.pdf'},
+  {n:8, code:'表P-RS1 002-02 02', label:'新產品製作通知單〞回收簽收單 - Bang ky nhan va thu hoi bang tb che bien sp', file:'/forms/P-RS1-002-02.02.pdf'},
+  {n:9, code:'表P-RS1 002-07.03', label:'產品製程、配方、規格更改通知單', file:'/forms/P-RS1-002-07.03.pdf'},
 ]
 
 const T = {

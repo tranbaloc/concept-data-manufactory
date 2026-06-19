@@ -43,19 +43,19 @@ const orders = [
 ]
 
 const stages = [
-  { step:1, label:'Nh\u1eadn Email', icon:'\u{1F4E7}', color:'#0078d4' },
-  { step:2, label:'T\u1ed5ng H\u1ee3p \u0110\u01a1n', icon:'\u{1F4CB}', color:'#107c10' },
-  { step:3, label:'R&D Sample', icon:'\u{1F9EA}', color:'#ca8a04' },
-  { step:4, label:'Th\u00f4ng B\u00e1o CB', icon:'\u{1F4C4}', color:'#8b5cf6' },
-  { step:5, label:'Quy C\u00e1ch NT', icon:'\u2705', color:'#0891b2' },
-  { step:6, label:'X\u00e1c Nh\u1eadn SP', icon:'\u{1F91D}', color:'#db2777' },
-  { step:7, label:'L\u1ec7nh S\u1ea3n Xu\u1ea5t', icon:'\u{1F3ED}', color:'#16a34a' },
+  { step:1, label:'\u0110\u01a1n M\u1eabu',          icon:'\ud83d\udccb', color:'#0078d4' },
+  { step:2, label:'G\u1eedi M\u1eabu',          icon:'\ud83d\udce6', color:'#107c10' },
+  { step:3, label:'COA',              icon:'\ud83d\udcc4', color:'#ca8a04' },
+  { step:4, label:'B\u00e1o C\u00e1o R&D',      icon:'\ud83e\uddea', color:'#8b5cf6' },
+  { step:5, label:'XNQC',             icon:'\u2705', color:'#0891b2' },
+  { step:6, label:'Ti\u00eau Chu\u1ea9n',       icon:'\ud83d\udcd1', color:'#db2777' },
+  { step:7, label:'H\u1ecdp Th\u1ecfa Thu\u1eadn',   icon:'\ud83e\udd1d', color:'#16a34a' },
 ]
 
 const stepRoutes = [
   '/orders/inbox','/orders/summary','/orders/sample-report',
-  '/orders/new-product-notice','/orders/acceptance-specs',
-  '/orders/product-confirm','/orders/production-order'
+  '/orders/sample-report','/orders/acceptance-specs',
+  '/orders/new-product-notice','/orders/product-confirm'
 ]
 
 const stageColors = ['#ef4444','#f97316','#eab308','#22c55e','#0891b2','#db2777','#16a34a']
@@ -81,12 +81,12 @@ const T = {
     workflowTitle: '\u{1F4D6} Hướng Dẫn Quy Trình - Biểu Mẫu Tương Ứng (17/17)',
     thStep: 'Bước', thName: 'Tên Bước', thForm: 'Biểu Mẫu P-RS1', thDept: 'Bộ Phận Phụ Trách', thAction: 'Thao Tác',
     open: 'Mở ->',
-    mainFlow: 'LUỒNG CHÍNH - SẢN PHẨM MỚI (13 biểu mẫu: 1 · 4 · 5 · 6 · 8 · 10 · 11 · 12 · 13 · 14 · 15 · 16 · 17)',
-    changeFlow: 'LUỒNG THAY ĐỔI KỸ THUẬT - Engineering Change Control (4 biểu mẫu: 2 · 3 · 7 · 9)',
+    mainFlow: 'LUỒNG CHÍNH - 樣品到成品完整流程 (Biểu mẫu: 1 · 10 · 11 · 12 · 13 · 14 · 15 · 16 · 17)',
+    changeFlow: 'LUỒNG THAY ĐỔI QC/PT - 樣品規格更改流程 (Biểu mẫu: 2 · 3 · 4 · 5 · 6 · 7 · 8 · 9 · 10 · 11 · 12)',
     coming: 'Sắp có',
-    totalForms: 'Tổng: 17/17 biểu mẫu',
-    mainForms: 'Luồng chính: 13 biểu mẫu (Mẫu 1, 4, 5, 6, 8, 10, 11, 12, 13, 14, 15, 16, 17)',
-    changeForms: 'Luồng thay đổi: 4 biểu mẫu (Mẫu 2, 3, 7, 9) - Engineering Change Control',
+    totalForms: 'Tổng: 17/17 biểu mẫu · Theo 001-流程.xlsx',
+    mainForms: 'Luồng chính: Mẫu 1, 10, 11, 12, 13, 14, 15, 16, 17',
+    changeForms: 'Luồng thay đổi QC/PT: Mẫu 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12',
   },
   zh: {
     title: '\u{1F504} \u8BA2\u5355\u6D41\u7A0B - \u603B\u89C8 Pipeline',
@@ -108,12 +108,12 @@ const T = {
     workflowTitle: '\u{1F4D6} \u6D41\u7A0B\u6307\u5357 - \u5BF9\u5E94\u8868\u5355 (17/17)',
     thStep: '\u6B65\u9AA4', thName: '\u6B65\u9AA4\u540D\u79F0', thForm: 'P-RS1 \u8868\u5355', thDept: '\u8D23\u4EFB\u90E8\u95E8', thAction: '\u64CD\u4F5C',
     open: '\u6253\u5F00 ->',
-    mainFlow: '\u4E3B\u6D41\u7A0B - \u65B0\u4EA7\u54C1 (13\u4E2A\u8868\u5355: 1 · 4 · 5 · 6 · 8 · 10 · 11 · 12 · 13 · 14 · 15 · 16 · 17)',
-    changeFlow: '\u5DE5\u7A0B\u53D8\u66F4\u6D41\u7A0B - Engineering Change Control (4\u4E2A\u8868\u5355: 2 · 3 · 7 · 9)',
-    coming: '\u5373\u5C06\u4E0A\u7EBF',
-    totalForms: '\u603B\u8BA1\uFF1A17/17\u4E2A\u8868\u5355',
-    mainForms: '\u4E3B\u6D41\u7A0B\uFF1A13\u4E2A\u8868\u5355',
-    changeForms: '\u5DE5\u7A0B\u53D8\u66F4\uFF1A4\u4E2A\u8868\u5355',
+    mainFlow: '主流程 - 樣品到成品完整流程 (表單: 1 · 10 · 11 · 12 · 13 · 14 · 15 · 16 · 17)',
+    changeFlow: '規格更改流程 - 樣品規格更改 (表單: 2 · 3 · 4 · 5 · 6 · 7 · 8 · 9 · 10 · 11 · 12)',
+    coming: '即將上線',
+    totalForms: '總計：17/17個表單 · 依001-流程.xlsx',
+    mainForms: '主流程：表單 1, 10, 11, 12, 13, 14, 15, 16, 17',
+    changeForms: '更改流程：表單 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12',
   },
 }
 
@@ -128,48 +128,60 @@ const Mau = ({n, change}) => (
 )
 
 const mainSteps = [
-  {step:1, name:'\u{1F4E7} Nh\u1eadn Email \u0110\u01a1n H\u00e0ng', forms:[], dept:'Kinh Doanh', route:'/orders/inbox'},
-  {step:2, name:'\u{1F4CB} T\u1ed5ng H\u1ee3p & Ph\u00e2n T\u00edch', forms:[
-    {n:4, code:'P-RS1 002-06.01', desc:'B\u1ea3ng \u0110\u1ec1 Xu\u1ea5t Thay \u0110\u1ed5i C\u00f4ng Tr\u00ecnh'},
-  ], dept:'Kinh Doanh + K\u1ebf Ho\u1ea1ch', route:'/orders/summary'},
-  {step:3, name:'\u{1F9EA} R&D Sample Report', forms:[
-    {n:1, code:'P-RS1 003-01.03', desc:'Sample Report'},
-  ], dept:'R&D', route:'/orders/sample-report'},
-  {step:4, name:'\u{1F4C4} Th\u00f4ng B\u00e1o Ch\u1ebf Bi\u1ebfn', forms:[
-    {n:10, code:'P-RS1 001-01.02', desc:'Th\u00f4ng B\u00e1o Ch\u1ebf Bi\u1ebfn S\u1ea3n Ph\u1ea9m M\u1edbi'},
-    {n:11, code:'P-RS1 001-03.02', desc:'T\u1edd Quy C\u00e1ch S\u1ea3n Ph\u1ea9m M\u1edbi'},
-    {n:15, code:'P-RS1 001-07.02 (ZH)', desc:'Nguy\u00ean T\u1eafc M\u00e3 H\u00f3a S\u1ea3n Ph\u1ea9m (Chinese)'},
-    {n:16, code:'P-RS1 001-07.02 (VI)', desc:'Nguy\u00ean T\u1eafc M\u00e3 H\u00f3a S\u1ea3n Ph\u1ea9m (Vietnam)'},
-  ], dept:'R&D + K\u1ef9 Thu\u1eadt', route:'/orders/new-product-notice'},
-  {step:5, name:'\u2705 Quy C\u00e1ch Nghi\u1ec7m Thu', forms:[
-    {n:12, code:'P-RS1 001-02.02', desc:'B\u1ea3ng NT Th\u00e0nh Ph\u1ea9m'},
-    {n:13, code:'P-RS1 003-09.03', desc:'B\u1ea3ng NT B\u00e1n Th\u00e0nh Ph\u1ea9m'},
-    {n:14, code:'P-RS1 003-03.02', desc:'B\u1ea3ng NT Nguy\u00ean Li\u1ec7u'},
-  ], dept:'QA + R&D + K\u1ef9 Thu\u1eadt', route:'/orders/acceptance-specs'},
-  {step:6, name:'\u{1F91D} X\u00e1c Nh\u1eadn S\u1ea3n Ph\u1ea9m', forms:[
-    {n:17, code:'P-RS1 001-06.03', desc:'Bi\u00ean B\u1ea3n H\u1ecdp Ph\u1ed1i H\u1ee3p - X\u00e1c Nh\u1eadn S\u1ea3n Ph\u1ea9m'},
-  ], dept:'T\u1ea5t C\u1ea3 B\u1ed9 Ph\u1eadn', route:'/orders/product-confirm'},
-  {step:7, name:'\u{1F3ED} Xu\u1ea5t L\u1ec7nh S\u1ea3n Xu\u1ea5t', forms:[
-    {n:8, code:'P-RS1 002-02.02', desc:'Thu H\u1ed3i Th\u00f4ng B\u00e1o Ch\u1ebf Bi\u1ebfn S\u1ea3n Ph\u1ea9m M\u1edbi'},
-    {n:6, code:'P-RS1 002-04.01', desc:'Thu H\u1ed3i T\u1edd Quy C\u00e1ch S\u1ea3n Ph\u1ea9m M\u1edbi'},
-    {n:5, code:'P-RS1 003-10.01', desc:'Thu H\u1ed3i B\u1ea3ng NT B\u00e1n Th\u00e0nh Ph\u1ea9m'},
-  ], dept:'K\u1ebf Ho\u1ea1ch + S\u1ea3n Xu\u1ea5t', route:'/orders/production-order'},
+  {step:1, name:'📋 Đơn Mẫu / 樣品單', forms:[], dept:'Kinh Doanh',
+    note:'4 dạng biểu mẫu đơn mẫu', route:'/orders/inbox'},
+
+  {step:2, name:'📦 Gửi Mẫu / 寄樣', forms:[], dept:'Kinh Doanh',
+    note:'2 dạng biểu mẫu gửi mẫu', route:'/orders/summary'},
+
+  {step:3, name:'📄 COA / Kinh Doanh', forms:[], dept:'Kinh Doanh',
+    note:'1 dạng biểu mẫu COA', route:'/orders/sample-report'},
+
+  {step:4, name:'🧪 Báo Cáo R&D / 製單（台灣研發）', forms:[
+    {n:1, code:'表P-RS1 003-01 03', desc:'SAMPLE REPORT - GIAVICO INTERNATIONAL FOOD COMPANY Ltd.'},
+  ], dept:'R&D Đài Loan', route:'/orders/sample-report'},
+
+  {step:5, name:'✅ Xác Nhận QC / 樣品規格確認單', forms:[], dept:'QA + R&D',
+    note:'2 dạng biểu mẫu XNQC', route:'/orders/acceptance-specs'},
+
+  {step:6, name:'📑 Tiêu Chuẩn / 標準書（7種）', forms:[
+    {n:10, code:'表P-RS1 001-01.02', desc:'新產品製造通知單 - Bang thong bao che bien san pham'},
+    {n:11, code:'表P-RS1 001-03.02', desc:'新產品規格說明書'},
+    {n:12, code:'表P-RS1 001-02 02', desc:'成品允收規格表'},
+    {n:13, code:'表P-RS1 003-09 03', desc:'半成品允收標準表單 - Bang quy cach nghiem thu ban thanh pham'},
+    {n:14, code:'表P-RS1 003-03 02', desc:'原料允收標準表單 - Bang qui cach nghiem thu nguyen lieu'},
+    {n:15, code:'表P-RS1 001-07 02', desc:'Giavico國際廠產品代號編碼原則 (Chinese) 20240311'},
+    {n:16, code:'表P-RS1 001-07 02', desc:'Giavico國際廠產品代號編碼原則 (Vietnam) 20240311'},
+  ], dept:'R&D + QA + Kỹ Thuật', route:'/orders/new-product-notice'},
+
+  {step:7, name:'🤝 Họp Thỏa Thuận / 協調會-產品確認單', forms:[
+    {n:17, code:'表P-RS1 001-06.03', desc:'協調會-產品確認單 - Bang xac dinh san pham hop thoa thuan'},
+  ], dept:'Tất Cả Bộ Phận', route:'/orders/product-confirm'},
 ]
 
+// Luồng thay đổi QC/PT: 樣品規格更改流程 (theo 001-流程.xlsx)
 const changeSteps = [
-  {step:'EC-1', name:'\u{1F4DD} \u0110\u1EC1 Xu\u1EA5t Thay \u0110\u1ED5i', forms:[
-    {n:3, code:'P-RS1 002-01.07', desc:'\u0110\u1EC1 Xu\u1EA5t Thay \u0110\u1ED5i Quy Tr\u00ECnh / C\u00F4ng Th\u1EE9c / Quy C\u00E1ch'},
-  ], dept:'R&D / K\u1EF9 Thu\u1EADt', route:'/orders/engineering-change', tab:0},
-  {step:'EC-2', name:'\u{1F4E2} Th\u00F4ng B\u00E1o Thay \u0110\u1ED5i QT', forms:[
-    {n:9, code:'P-RS1 002-07.03', desc:'Th\u00F4ng B\u00E1o Thay \u0110\u1ED5i Quy Tr\u00ECnh, C\u00F4ng Th\u1EE9c, Quy C\u00E1ch'},
-  ], dept:'R&D + QA', route:'/orders/engineering-change', tab:1},
-  {step:'EC-3', name:'\u2699\uFE0F Th\u00F4ng B\u00E1o Thay \u0110\u1ED5i CT', forms:[
-    {n:2, code:'P-RS1 002-05.04', desc:'Th\u00F4ng B\u00E1o Thay \u0110\u1ED5i K\u1EF9 Thu\u1EADt (Engineering Change Notice)'},
-  ], dept:'K\u1EF9 Thu\u1EADt + S\u1EA3n Xu\u1EA5t', route:'/orders/engineering-change', tab:2},
-  {step:'EC-4', name:'\u267B\uFE0F Thu H\u1ED3i Th\u00F4ng B\u00E1o C\u0169', forms:[
-    {n:7, code:'P-RS1 002-03.02', desc:'Thu H\u1ED3i Th\u00F4ng B\u00E1o Thay \u0110\u1ED5i C\u00F4ng Th\u1EE9c H\u1ED7 Tr\u1EE3 S\u1EA3n Ph\u1EA9m'},
-  ], dept:'QA + L\u01B0u Tr\u1EEF', route:'/orders/engineering-change', tab:3},
+  {step:'EC-1', name:'📝 Biểu Mẫu Thay Đổi / 變更申請單（4種）', forms:[
+    {n:2, code:'表P-RS1 002-05.04', desc:'工程變更通知單 - Bang thay doi qui trinh va phuong thuc'},
+    {n:3, code:'表P-RS1 002-01.07', desc:'製程、配方、規格提議更改單 - Bang de xuat thay doi qui trinh phuong thuc va qui cach'},
+    {n:4, code:'表P-RS1 002-06.01', desc:'工程變更申請單-新增表單 - Bang de xuat thay doi cong trinh'},
+  ], dept:'R&D / Kỹ Thuật', route:'/orders/engineering-change', tab:0},
+
+  {step:'EC-2', name:'♻️ Thu Hồi Tiêu Chuẩn / 回收相關標準書（4種）', forms:[
+    {n:5, code:'表P-RS1 003-10.01', desc:'半成品允收規格表回收簽收單 - Bang ky nhan va thu hoi bang quy cach nghiem thu BTP'},
+    {n:6, code:'表P-RS1 002-04 01', desc:'〝新產品規格說明單〞回收簽收單'},
+    {n:7, code:'表P-RS1 002-03.02', desc:'產品支撐配方規格更改通知單回收簽單'},
+    {n:8, code:'表P-RS1 002-02 02', desc:'新產品製作通知單〞回收簽收單 - Bang ky nhan va thu hoi bang tb che bien sp'},
+  ], dept:'QA + Lưu Trữ', route:'/orders/engineering-change', tab:1},
+
+  {step:'EC-3', name:'📋 Tiêu Chuẩn Mới / 標準書（4種）', forms:[
+    {n:9,  code:'表P-RS1 002-07.03', desc:'產品製程、配方、規格更改通知單'},
+    {n:10, code:'表P-RS1 001-01.02', desc:'新產品製造通知單 - Bang thong bao che bien san pham'},
+    {n:11, code:'表P-RS1 001-03.02', desc:'新產品規格說明書'},
+    {n:12, code:'表P-RS1 001-02 02', desc:'成品允收規格表'},
+  ], dept:'R&D + QA + Kỹ Thuật', route:'/orders/engineering-change', tab:2},
 ]
+
 
 export default function OrderPipeline() {
   const { lang } = useLang()
@@ -300,13 +312,13 @@ export default function OrderPipeline() {
                   {'\U0001F195'} {tx.mainFlow}
                 </td>
               </tr>
-              {mainSteps.map(({step,name,forms,dept,route}) => (
+              {mainSteps.map((item) => { const {step,name,forms,dept,route} = item; return (
                 <tr key={step}>
                   <td style={{fontWeight:700,color:stageColors[step-1],textAlign:'center',fontSize:15}}>{step}</td>
                   <td style={{fontWeight:500,fontSize:12.5}}>{name}</td>
                   <td>
                     {forms.length === 0
-                      ? <span style={{color:'var(--muted)',fontSize:11}}>- (AI trích xuất email)</span>
+                      ? <span style={{color:'var(--muted)',fontSize:11,fontStyle:'italic'}}>({item.note || 'Biểu mẫu nội bộ'})</span>
                       : <div style={{display:'flex',flexDirection:'column',gap:5}}>
                           {forms.map(f => (
                             <div key={f.n} style={{display:'flex',alignItems:'center',gap:6,fontSize:11.5}}>
@@ -323,7 +335,7 @@ export default function OrderPipeline() {
                     <button className="btn btn-outline btn-sm" onClick={() => navigate(route)}>{tx.open}</button>
                   </td>
                 </tr>
-              ))}
+              )})}
               <tr>
                 <td colSpan={5} style={{background:'#fff8e6',padding:'6px 12px',fontSize:11,fontWeight:700,color:'#92400e',letterSpacing:.4,borderTop:'2px solid #f59e0b'}}>
                   {'\U0001F504'} {tx.changeFlow}

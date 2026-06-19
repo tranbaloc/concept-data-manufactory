@@ -7,8 +7,8 @@ import { useLang } from '../../i18n/context'
 
 function StepBar({ active }) {
   const steps = [
-    ['1','📧','Nhận Email'],['2','📋','Tổng Hợp'],['3','🧪','R&D Sample'],
-    ['4','📄','Thông Báo CB'],['5','✅','Quy Cách NT'],['6','🤝','Xác Nhận SP'],['7','🏭','Lệnh SX'],
+    ['1','📋','Đơn Mẫu'],['2','📦','Gửi Mẫu'],['3','📄','COA'],
+    ['4','🧪','Báo Cáo R&D'],['5','✅','XNQC'],['6','📑','Tiêu Chuẩn'],['7','🤝','Họp Thỏa Thuận'],
   ]
   return (
     <div className="card" style={{padding:'12px 20px'}}>

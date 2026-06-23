@@ -321,6 +321,16 @@ export default function ProductionSchedule() {
   const [cfStep, setCfStep] = useState(null)
   const [activePP, setActivePP] = useState(null)
 
+  // Editable form rows (copies of static data for inline editing)
+  const [avRows, setAvRows] = useState(() => avOrders.map((o,i)=>({...o,_id:i})))
+  const [gvRows, setGvRows] = useState(() => gvPackaging.map((p,i)=>({...p,_id:i})))
+  const [ndRows, setNdRows] = useState(() => ndWeeklyPlan.map((w,i)=>({...w,_id:i})))
+  // Approval chains per form (step index, history)
+  const [avApproval, setAvApproval] = useState({step:0,history:[],comment:''})
+  const [gvApproval, setGvApproval] = useState({step:0,history:[],comment:''})
+  const [ndApproval, setNdApproval] = useState({step:0,history:[],comment:''})
+
+
   /* ────── VERSION SWITCHER BAR ────── */
   const VersionBar = () => (
     <div style={{background:'#1e293b',borderRadius:10,padding:'12px 18px',marginBottom:18,display:'flex',alignItems:'center',gap:16,flexWrap:'wrap'}}>
@@ -560,188 +570,552 @@ export default function ProductionSchedule() {
     </div>
   ) : null
 
-  /* ── AV LINE TAB ── */
-  const renderAVLine = () => (
-    <div className="sg">
-      <div className="card" style={{border:'2px solid #0078d422'}}>
-        <div className="card-title"><span className="card-title-left">🔄 Quy Trình Sắp Kế Hoạch AV<NewBadge/></span><span className="tsm cm">Nguồn: QUY TRÌNH SẮP KẾ HOẠCH AV.docx</span></div>
-        <WorkflowDiagram steps={avWorkflowSteps} activeStep={avStep} setStep={setAvStep}/>
-        {avStep && <StepDetail step={avWorkflowSteps.find(s=>s.id===avStep)}/>}
-        {!avStep && <p className="tsm cm mt4">👆 Click vào bước để xem hướng dẫn chi tiết</p>}
+  /* ────── APPROVAL FLOW COMPONENT ────── */
+  const approvalStepsAV = [
+    {label:'Người Lập',role:'BP Kế Hoạch',icon:'✍️'},
+    {label:'Trưởng BP KH',role:'Nguyễn/Trần',icon:'👔'},
+    {label:'Trưởng BP NVL',role:'殷賢清',icon:'📦'},
+    {label:'Phó Tổng ĐH',role:'李群立',icon:'🏛️'},
+    {label:'Ban Giám Đốc',role:'Phê duyệt cuối',icon:'✅'},
+  ]
+  const approvalStepsGV = [
+    {label:'Người Lập',role:'BP Kế Hoạch',icon:'✍️'},
+    {label:'BP NVL Xác Nhận',role:'殷賢清',icon:'📦'},
+    {label:'Phó Tổng ĐH',role:'李群立',icon:'🏛️'},
+  ]
+  const approvalStepsND = [
+    {label:'SX1 Lập Kế Hoạch',role:'BP Sản Xuất 1',icon:'🌱'},
+    {label:'SX2 Xác Nhận',role:'BP Sản Xuất 2',icon:'⚡'},
+    {label:'BP Kế Hoạch',role:'Duyệt tổng',icon:'📋'},
+    {label:'Phó Tổng ĐH',role:'李群立',icon:'🏛️'},
+  ]
+
+  const ApprovalFlow = ({apv, setApv, steps, color='#0078d4', formLabel}) => {
+    const isDone = apv.step >= steps.length
+    return (
+    <div style={{border:`2px solid ${color}33`,borderRadius:10,overflow:'hidden',marginTop:4}}>
+      <div style={{background:color,padding:'8px 16px',display:'flex',justifyContent:'space-between',alignItems:'center'}}>
+        <div style={{color:'#fff',fontWeight:700,fontSize:13}}>🔏 QUY TRÌNH PHÊ DUYỆT – {formLabel}</div>
+        <div style={{color:'rgba(255,255,255,.8)',fontSize:11}}>
+          {isDone ? '✅ Đã hoàn tất phê duyệt' : `Bước ${apv.step+1}/${steps.length}: ${steps[apv.step]?.label}`}
+        </div>
       </div>
-      <div className="card">
-        <div className="card-title"><span className="card-title-left">📐 Tiêu Chuẩn Phân Bổ NVL Theo Quy Cách<NewBadge/></span></div>
-        <div style={{display:'grid',gridTemplateColumns:'repeat(3,1fr)',gap:10}}>
-          {avProductSpecs.map((p,i)=>(
-            <div key={i} style={{border:`1.5px solid ${p.color}44`,borderRadius:8,padding:12,background:`${p.color}06`}}>
-              <div style={{fontWeight:700,fontSize:12,color:p.color,marginBottom:4}}>{p.code}</div>
-              <div style={{display:'flex',alignItems:'center',gap:8,marginBottom:4}}>
-                <span className="badge badge-gray" style={{fontSize:10}}>{p.spec}</span>
-                <span style={{fontSize:18,fontWeight:800,color:p.color}}>{typeof p.nvlPct==='number'?`${p.nvlPct}%`:p.nvlPct}</span>
-                {typeof p.nvlPct==='number' && <span className="tsm cm">NVL</span>}
-              </div>
-              <div style={{fontSize:11,color:'var(--muted)',lineHeight:1.4}}>{p.note}</div>
-              {typeof p.nvlPct==='number' && (
-                <div style={{marginTop:8,background:'#f1f5f9',borderRadius:4,height:6,overflow:'hidden'}}>
-                  <div style={{width:`${p.nvlPct}%`,height:'100%',background:p.color,borderRadius:4}}/>
+      {/* Chain visualization */}
+      <div style={{background:'#f8fafc',padding:'16px 20px',borderBottom:'1px solid #e2e8f0'}}>
+        <div style={{display:'flex',alignItems:'center',gap:0,flexWrap:'nowrap',overflowX:'auto'}}>
+          {steps.map((s,i)=>{
+            const done = i < apv.step
+            const active = i === apv.step
+            const pending = i > apv.step
+            return (
+              <div key={i} style={{display:'flex',alignItems:'center',flexShrink:0}}>
+                <div style={{textAlign:'center',width:110}}>
+                  <div style={{
+                    width:48,height:48,borderRadius:'50%',margin:'0 auto 6px',
+                    display:'flex',alignItems:'center',justifyContent:'center',fontSize:20,
+                    background: done?'#dcfce7':active?color:'#f1f5f9',
+                    border:`3px solid ${done?'#16a34a':active?color:'#d1d5db'}`,
+                    boxShadow: active?`0 0 0 4px ${color}22`:undefined,
+                    transition:'all .2s'
+                  }}>{done?'✓':s.icon}</div>
+                  <div style={{fontSize:10.5,fontWeight:active||done?700:400,color:done?'#16a34a':active?color:'#9ca3af',lineHeight:1.3}}>{s.label}</div>
+                  <div style={{fontSize:9.5,color:'#9ca3af',marginTop:2}}>{s.role}</div>
+                  {done && apv.history[i] && (
+                    <div style={{fontSize:9,color:'#16a34a',marginTop:2,fontStyle:'italic'}}>
+                      {apv.history[i].action==='approved'?'✓ Đã duyệt':'✗ Từ chối'} {apv.history[i].time}
+                    </div>
+                  )}
                 </div>
-              )}
+                {i < steps.length-1 && (
+                  <div style={{width:28,height:2,background:done?'#16a34a':'#e2e8f0',flexShrink:0,marginBottom:20,transition:'background .3s'}}/>
+                )}
+              </div>
+            )
+          })}
+        </div>
+      </div>
+      {/* Action panel */}
+      {!isDone && (
+        <div style={{padding:'12px 20px',background:'#fff',display:'flex',gap:10,alignItems:'center',flexWrap:'wrap'}}>
+          <input
+            value={apv.comment}
+            onChange={e=>setApv(p=>({...p,comment:e.target.value}))}
+            placeholder={`Ghi chú cho bước "${steps[apv.step]?.label}"...`}
+            style={{flex:1,minWidth:200,padding:'6px 10px',borderRadius:6,border:'1px solid #d1d5db',fontSize:12,outline:'none'}}
+          />
+          <button onClick={()=>{
+            const now = new Date().toLocaleTimeString('vi-VN',{hour:'2-digit',minute:'2-digit'})
+            setApv(p=>({step:p.step+1,comment:'',history:[...p.history,{action:'approved',time:now,note:p.comment,by:steps[p.step]?.role}]}))
+          }} style={{padding:'7px 18px',background:'#16a34a',color:'#fff',border:'none',borderRadius:6,cursor:'pointer',fontWeight:700,fontSize:12,whiteSpace:'nowrap'}}>
+            ✓ Phê Duyệt
+          </button>
+          <button onClick={()=>{
+            const now = new Date().toLocaleTimeString('vi-VN',{hour:'2-digit',minute:'2-digit'})
+            setApv(p=>({...p,comment:'',history:[...p.history,{action:'rejected',time:now,note:p.comment,by:steps[p.step]?.role}]}))
+          }} style={{padding:'7px 14px',background:'#dc2626',color:'#fff',border:'none',borderRadius:6,cursor:'pointer',fontWeight:700,fontSize:12,whiteSpace:'nowrap'}}>
+            ✗ Từ Chối
+          </button>
+          <button onClick={()=>setApv({step:0,history:[],comment:''})} style={{padding:'7px 12px',background:'#f1f5f9',color:'#6b7280',border:'1px solid #d1d5db',borderRadius:6,cursor:'pointer',fontSize:12,whiteSpace:'nowrap'}}>
+            ↺ Reset
+          </button>
+        </div>
+      )}
+      {/* History log */}
+      {apv.history.length > 0 && (
+        <div style={{padding:'8px 20px 12px',background:'#f8fafc',borderTop:'1px solid #e2e8f0'}}>
+          <div style={{fontSize:11,fontWeight:600,color:'#6b7280',marginBottom:6}}>📜 Lịch sử phê duyệt</div>
+          {apv.history.map((h,i)=>(
+            <div key={i} style={{fontSize:11,display:'flex',gap:8,alignItems:'center',marginBottom:3}}>
+              <span style={{color:h.action==='approved'?'#16a34a':'#dc2626',fontWeight:700}}>{h.action==='approved'?'✓':'✗'} {steps[i]?.label}</span>
+              <span style={{color:'#6b7280'}}>bởi {h.by} · {h.time}</span>
+              {h.note && <span style={{color:'#374151',fontStyle:'italic'}}>"{h.note}"</span>}
+            </div>
+          ))}
+        </div>
+      )}
+      {isDone && (
+        <div style={{padding:'12px 20px',background:'#f0fdf4',borderTop:'1px solid #bbf7d0',display:'flex',justifyContent:'space-between',alignItems:'center'}}>
+          <span style={{color:'#16a34a',fontWeight:700,fontSize:13}}>🎉 Phiếu đã được phê duyệt hoàn tất!</span>
+          <button onClick={()=>setApv({step:0,history:[],comment:''})} style={{padding:'5px 12px',background:'#f1f5f9',color:'#6b7280',border:'1px solid #d1d5db',borderRadius:6,cursor:'pointer',fontSize:12}}>
+            ↺ Mở lại
+          </button>
+        </div>
+      )}
+    </div>
+  )}
+
+  /* ────── EDITABLE CELL HELPERS ────── */
+  const numInput = (val, onChange, color='inherit') => (
+    <input type="number" value={val||''} onChange={e=>onChange(Number(e.target.value)||0)}
+      style={{width:'100%',padding:'3px 6px',border:'1px solid #dbeafe',borderRadius:4,fontSize:12,
+        textAlign:'right',color,fontWeight:600,background:'#fffff8',outline:'none',boxSizing:'border-box'}}/>
+  )
+  const txtInput = (val, onChange) => (
+    <input type="text" value={val||''} onChange={e=>onChange(e.target.value)}
+      style={{width:'100%',padding:'3px 6px',border:'1px solid #dbeafe',borderRadius:4,fontSize:11,
+        color:'inherit',background:'#fffff8',outline:'none',boxSizing:'border-box'}}/>
+  )
+  const selInput = (val, onChange, opts) => (
+    <select value={val} onChange={e=>onChange(e.target.value)}
+      style={{width:'100%',padding:'3px 4px',border:'1px solid #dbeafe',borderRadius:4,fontSize:11,background:'#fffff8',outline:'none'}}>
+      {opts.map(o=><option key={o.v} value={o.v}>{o.l}</option>)}
+    </select>
+  )
+
+
+  /* ══ AV LINE ══ */
+  const renderAVLine = () => {
+    const totalQty = avRows.reduce((s,o)=>s+Number(o.qty||0),0)
+    const totalNVL = avRows.reduce((s,o)=>s+Number(o.materialReq||0),0)
+    const regionColor = r=>r==='Nội địa'?'#0078d4':r==='Hàn Quốc'?'#059669':r==='Đông Nam Á'?'#d97706':'#8b5cf6'
+    const updateAV = (id,field,val) => setAvRows(rows=>rows.map(r=>r._id===id?{...r,[field]:val}:r))
+    return (
+    <div className="sg">
+      {/* ── BIỂU MẪU 1: BẢNG TÍNH NGUYÊN LIỆU AV ── */}
+      <div style={{border:'2px solid #0078d4',borderRadius:10,overflow:'hidden'}}>
+        <div style={{background:'#0078d4',padding:'10px 18px',display:'flex',justifyContent:'space-between',alignItems:'center',flexWrap:'wrap',gap:8}}>
+          <div>
+            <div style={{color:'#fff',fontWeight:800,fontSize:15}}>BẢNG TÍNH NGUYÊN LIỆU AV / AV計算原料</div>
+            <div style={{color:'rgba(255,255,255,.75)',fontSize:11,marginTop:2}}>Sheet: 2026計算原料2.3 · Chỉnh sửa trực tiếp trên bảng · ✏️ = ô có thể nhập</div>
+          </div>
+          <div style={{display:'flex',gap:8,alignItems:'center'}}>
+            <div style={{textAlign:'right',color:'rgba(255,255,255,.85)',fontSize:11}}>
+              <div>Kỳ SX: Tháng 10–11/2025</div>
+              <div>Cập nhật: 2026-02-27</div>
+            </div>
+            <button onClick={()=>setAvRows(avOrders.map((o,i)=>({...o,_id:i})))} style={{padding:'5px 10px',background:'rgba(255,255,255,.2)',color:'#fff',border:'1px solid rgba(255,255,255,.4)',borderRadius:6,cursor:'pointer',fontSize:11}}>↺ Reset</button>
+          </div>
+        </div>
+        <div style={{overflowX:'auto'}}>
+          <table style={{width:'100%',borderCollapse:'collapse',fontSize:12}}>
+            <thead>
+              <tr style={{background:'#dbeafe'}}>
+                <th style={{padding:'7px 8px',border:'1px solid #bfdbfe',fontSize:10,textAlign:'center',whiteSpace:'nowrap'}}>#</th>
+                <th style={{padding:'7px 8px',border:'1px solid #bfdbfe',fontSize:10,whiteSpace:'nowrap'}}>Tháng SX</th>
+                <th style={{padding:'7px 8px',border:'1px solid #bfdbfe',fontSize:10,whiteSpace:'nowrap'}}>Khu Vực</th>
+                <th style={{padding:'7px 8px',border:'1px solid #bfdbfe',fontSize:10,whiteSpace:'nowrap'}}>Mã Đơn Hàng</th>
+                <th style={{padding:'7px 8px',border:'1px solid #bfdbfe',fontSize:10,whiteSpace:'nowrap'}}>Mã Sản Phẩm</th>
+                <th style={{padding:'7px 8px',border:'1px solid #bfdbfe',fontSize:10,textAlign:'center',whiteSpace:'nowrap'}}>Quy Cách</th>
+                <th style={{padding:'7px 8px',border:'1px solid #bfdbfe',fontSize:10,textAlign:'right',whiteSpace:'nowrap'}}>✏️ SL (thùng)</th>
+                <th style={{padding:'7px 8px',border:'1px solid #bfdbfe',fontSize:10,textAlign:'right',whiteSpace:'nowrap'}}>✏️ NVL (kg)</th>
+                <th style={{padding:'7px 8px',border:'1px solid #bfdbfe',fontSize:10,whiteSpace:'nowrap'}}>Deadline</th>
+                <th style={{padding:'7px 8px',border:'1px solid #bfdbfe',fontSize:10,whiteSpace:'nowrap'}}>✏️ Ghi Chú</th>
+                <th style={{padding:'7px 8px',border:'1px solid #bfdbfe',fontSize:10,textAlign:'center',whiteSpace:'nowrap'}}>Trạng Thái</th>
+              </tr>
+            </thead>
+            <tbody>
+              {avRows.map((o,i)=>(
+                <tr key={o._id} style={{background:i%2===0?'#fff':'#f8fafc'}}>
+                  <td style={{padding:'5px 8px',border:'1px solid #e2e8f0',textAlign:'center',color:'#9ca3af',fontSize:11}}>{i+1}</td>
+                  <td style={{padding:'5px 8px',border:'1px solid #e2e8f0',fontSize:11,whiteSpace:'nowrap'}}>{o.month}</td>
+                  <td style={{padding:'5px 8px',border:'1px solid #e2e8f0'}}>
+                    <span style={{background:`${regionColor(o.region)}18`,color:regionColor(o.region),padding:'2px 7px',borderRadius:10,fontSize:10,fontWeight:600}}>{o.region}</span>
+                  </td>
+                  <td style={{padding:'5px 8px',border:'1px solid #e2e8f0',fontFamily:'monospace',fontSize:11,color:'#0078d4',fontWeight:600,whiteSpace:'nowrap'}}>{o.orderId}</td>
+                  <td style={{padding:'5px 8px',border:'1px solid #e2e8f0',fontFamily:'monospace',fontSize:10,whiteSpace:'nowrap'}}>{o.productCode}</td>
+                  <td style={{padding:'5px 8px',border:'1px solid #e2e8f0',textAlign:'center'}}>
+                    <span style={{background:o.spec==='0505'?'#dbeafe':o.spec==='0808'?'#fef3c7':o.spec==='1010'?'#ede9fe':'#f1f5f9',color:o.spec==='0505'?'#1e40af':o.spec==='0808'?'#92400e':o.spec==='1010'?'#5b21b6':'#475569',padding:'2px 7px',borderRadius:4,fontSize:11,fontWeight:700}}>{o.spec}</span>
+                  </td>
+                  <td style={{padding:'4px 8px',border:'1px solid #e2e8f0',minWidth:90}}>
+                    {numInput(o.qty, v=>updateAV(o._id,'qty',v), '#1e40af')}
+                  </td>
+                  <td style={{padding:'4px 8px',border:'1px solid #e2e8f0',minWidth:110}}>
+                    {numInput(o.materialReq, v=>updateAV(o._id,'materialReq',v), o.materialReq>100000?'#dc2626':o.materialReq>50000?'#d97706':'#059669')}
+                  </td>
+                  <td style={{padding:'5px 8px',border:'1px solid #e2e8f0',fontSize:11,whiteSpace:'nowrap'}}>{o.deadline}</td>
+                  <td style={{padding:'4px 8px',border:'1px solid #e2e8f0',minWidth:140}}>
+                    {txtInput(o.note, v=>updateAV(o._id,'note',v))}
+                  </td>
+                  <td style={{padding:'4px 8px',border:'1px solid #e2e8f0',minWidth:110}}>
+                    {selInput(o.status||'pending', v=>updateAV(o._id,'status',v), [
+                      {v:'pending',l:'⏳ Chưa SX'},{v:'in_progress',l:'⚡ Đang SX'},{v:'done',l:'✓ Hoàn thành'},{v:'blocked',l:'🔴 Bị chặn'}
+                    ])}
+                  </td>
+                </tr>
+              ))}
+              <tr style={{background:'#dbeafe',fontWeight:700}}>
+                <td colSpan={6} style={{padding:'7px 10px',border:'1px solid #93c5fd',fontWeight:800,color:'#1e40af',fontSize:12}}>TỔNG CỘNG / 合計</td>
+                <td style={{padding:'7px 10px',border:'1px solid #93c5fd',textAlign:'right',color:'#1e40af',fontSize:13}}>{totalQty.toLocaleString()}</td>
+                <td style={{padding:'7px 10px',border:'1px solid #93c5fd',textAlign:'right',color:'#dc2626',fontSize:13,fontWeight:800}}>{totalNVL.toLocaleString()} kg</td>
+                <td colSpan={3} style={{padding:'7px 10px',border:'1px solid #93c5fd',color:'#6b7280',fontSize:11}}>≈ {(totalNVL/1000).toFixed(1)} tấn · {avRows.length} đơn hàng</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div style={{padding:'10px 18px',background:'#eff6ff',borderTop:'1px solid #bfdbfe',display:'grid',gridTemplateColumns:'repeat(4,1fr)',gap:12}}>
+          {[{l:'TỔNG ĐƠN',v:avRows.length,u:'đơn',c:'#0078d4'},{l:'TỔNG SL',v:totalQty.toLocaleString(),u:'thùng',c:'#374151'},{l:'TỔNG NVL',v:(totalNVL/1000).toFixed(1),u:'tấn',c:'#dc2626'},{l:'KHU VỰC',v:3,u:'khu vực',c:'#374151'}].map((k,i)=>(
+            <div key={i}><div style={{fontSize:10,color:'#6b7280',fontWeight:600}}>{k.l}</div><div style={{fontWeight:800,fontSize:20,color:k.c}}>{k.v}<span style={{fontSize:12,fontWeight:400}}> {k.u}</span></div></div>
+          ))}
+        </div>
+      </div>
+
+      {/* ── TIÊU CHUẨN PHÂN BỔ NVL ── */}
+      <div style={{border:'2px solid #e2e8f0',borderRadius:10,overflow:'hidden'}}>
+        <div style={{background:'#1e293b',padding:'8px 18px',display:'flex',justifyContent:'space-between',alignItems:'center'}}>
+          <div style={{color:'#fff',fontWeight:700,fontSize:13}}>TIÊU CHUẨN PHÂN BỔ NGUYÊN LIỆU THEO QUY CÁCH / 各規格原料分配標準</div>
+          <div style={{color:'rgba(255,255,255,.6)',fontSize:11}}>BP Sản Xuất AV áp dụng</div>
+        </div>
+        <div style={{overflowX:'auto'}}>
+          <table style={{width:'100%',borderCollapse:'collapse',fontSize:12}}>
+            <thead>
+              <tr style={{background:'#f1f5f9'}}>
+                {['Mã Sản Phẩm','Quy Cách','Tỷ Lệ NVL','Trực Quan','Ghi Chú / Công Thức'].map((h,i)=>(
+                  <th key={i} style={{padding:'8px 12px',border:'1px solid #e2e8f0',fontSize:11,textAlign:i>1?'center':'left'}}>{h}</th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {avProductSpecs.map((p,i)=>(
+                <tr key={i} style={{background:i%2===0?'#fff':'#f8fafc'}}>
+                  <td style={{padding:'7px 12px',border:'1px solid #e2e8f0',fontFamily:'monospace',fontSize:11,color:p.color,fontWeight:700}}>{p.code}</td>
+                  <td style={{padding:'7px 12px',border:'1px solid #e2e8f0',textAlign:'center'}}>
+                    <span style={{background:`${p.color}18`,color:p.color,padding:'3px 10px',borderRadius:4,fontWeight:700,fontSize:12}}>{p.spec}</span>
+                  </td>
+                  <td style={{padding:'7px 12px',border:'1px solid #e2e8f0',textAlign:'center',fontWeight:800,fontSize:18,color:p.color}}>{typeof p.nvlPct==='number'?`${p.nvlPct}%`:p.nvlPct}</td>
+                  <td style={{padding:'7px 12px',border:'1px solid #e2e8f0',width:180}}>
+                    {typeof p.nvlPct==='number' && (
+                      <div style={{background:'#f1f5f9',borderRadius:4,height:10,overflow:'hidden'}}>
+                        <div style={{width:`${p.nvlPct}%`,height:'100%',background:p.color,borderRadius:4}}/>
+                      </div>
+                    )}
+                  </td>
+                  <td style={{padding:'7px 12px',border:'1px solid #e2e8f0',fontSize:11,color:'#6b7280'}}>{p.note}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      {/* ── PHÊ DUYỆT AV ── */}
+      <ApprovalFlow apv={avApproval} setApv={setAvApproval} steps={approvalStepsAV} color="#0078d4" formLabel="BẢNG TÍNH NVL AV"/>
+
+      {/* ── QUY TRÌNH 7 BƯỚC ── */}
+      <div style={{border:'2px solid #e2e8f0',borderRadius:10,overflow:'hidden'}}>
+        <div style={{background:'#f8fafc',padding:'8px 18px',borderBottom:'1px solid #e2e8f0'}}>
+          <div style={{fontWeight:700,fontSize:13,color:'var(--text)'}}>QUY TRÌNH SẮP KẾ HOẠCH AV – 7 BƯỚC / AV計劃排程流程</div>
+          <div style={{fontSize:11,color:'var(--muted)',marginTop:2}}>Click vào bước để xem hướng dẫn chi tiết</div>
+        </div>
+        <div style={{padding:'14px 18px'}}>
+          <WorkflowDiagram steps={avWorkflowSteps} activeStep={avStep} setStep={setAvStep}/>
+          {avStep ? <StepDetail step={avWorkflowSteps.find(s=>s.id===avStep)}/> : <div style={{fontSize:12,color:'var(--muted)',marginTop:4}}>👆 Click vào từng bước để xem nội dung chi tiết</div>}
+        </div>
+      </div>
+    </div>
+  )}
+
+  /* ══ GV LINE ══ */
+  const renderGVLine = () => {
+    const statusBg = s=>s==='done'?'#dcfce7':s==='in_progress'?'#dbeafe':'#f1f5f9'
+    const statusColor2 = s=>s==='done'?'#15803d':s==='in_progress'?'#1d4ed8':'#6b7280'
+    const statusLabel = s=>({done:'✓ Đã xong',in_progress:'⟳ Đang giao',pending:'⧗ Chưa về'})[s]||s
+    const updateGV = (id,field,val) => setGvRows(rows=>rows.map(r=>r._id===id?{...r,[field]:val}:r))
+    const totalOrdered = gvRows.reduce((s,p)=>s+Number(p.orderQty||0),0)
+    const totalStock = gvRows.reduce((s,p)=>s+Number(p.tonKho||0),0)
+    return (
+    <div className="sg">
+      {/* ── TIẾN ĐỘ BAO BÌ CHAI ── */}
+      <div style={{border:'2px solid #059669',borderRadius:10,overflow:'hidden'}}>
+        <div style={{background:'#059669',padding:'10px 18px',display:'flex',justifyContent:'space-between',alignItems:'center',flexWrap:'wrap',gap:8}}>
+          <div>
+            <div style={{color:'#fff',fontWeight:800,fontSize:15}}>TIẾN ĐỘ XIN MUA BAO BÌ CHAI / 瓶裝包材採購進度</div>
+            <div style={{color:'rgba(255,255,255,.75)',fontSize:11,marginTop:2}}>Đơn: VN-26020018 · SP: VMX-AP244-RAL-T1 CLASSY · ✏️ = ô có thể chỉnh sửa</div>
+          </div>
+          <div style={{display:'flex',gap:8}}>
+            <div style={{textAlign:'right',color:'rgba(255,255,255,.85)',fontSize:11}}>
+              <div style={{fontWeight:700}}>8 FCL · 160 pallets</div>
+              <div>322,572 chai tổng cộng</div>
+            </div>
+            <button onClick={()=>setGvRows(gvPackaging.map((p,i)=>({...p,_id:i})))} style={{padding:'5px 10px',background:'rgba(255,255,255,.2)',color:'#fff',border:'1px solid rgba(255,255,255,.4)',borderRadius:6,cursor:'pointer',fontSize:11}}>↺ Reset</button>
+          </div>
+        </div>
+        {/* KPI header */}
+        <div style={{background:'#f0fdf4',borderBottom:'1px solid #bbf7d0',padding:'10px 18px',display:'grid',gridTemplateColumns:'repeat(4,1fr)',gap:10}}>
+          {[
+            {l:'ĐÃ GIAO XONG',v:gvRows.filter(r=>r.status==='done').length,u:`/${gvRows.length} loại`,c:'#15803d'},
+            {l:'ĐANG GIAO',v:gvRows.filter(r=>r.status==='in_progress').length,u:'loại',c:'#1d4ed8'},
+            {l:'CHƯA VỀ',v:gvRows.filter(r=>r.status==='pending').length,u:'loại',c:'#dc2626'},
+            {l:'TỔNG TỒN KHO',v:totalStock.toLocaleString(),u:'đơn vị',c:'#374151'},
+          ].map((k,i)=>(
+            <div key={i}><div style={{fontSize:10,color:'#6b7280',fontWeight:600}}>{k.l}</div><div style={{fontWeight:800,fontSize:18,color:k.c}}>{k.v}<span style={{fontSize:11,fontWeight:400}}> {k.u}</span></div></div>
+          ))}
+        </div>
+        {/* Bảng tiến độ - editable */}
+        <div style={{overflowX:'auto'}}>
+          <table style={{width:'100%',borderCollapse:'collapse',fontSize:12}}>
+            <thead>
+              <tr style={{background:'#dcfce7'}}>
+                {['STT','Tên Vật Tư / Bao Bì','Mã Code','✏️ Tồn Kho','✏️ SL Đặt Mua','Đơn Vị','Lead Time','✏️ Tiến Độ Giao','✏️ Trạng Thái'].map((h,i)=>(
+                  <th key={i} style={{padding:'7px 9px',border:'1px solid #bbf7d0',fontSize:11,textAlign:i>=3&&i<=4?'right':'left',whiteSpace:'nowrap'}}>{h}</th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {gvRows.map((p,i)=>(
+                <tr key={p._id} style={{background:i%2===0?'#fff':'#f8fafc'}}>
+                  <td style={{padding:'6px 9px',border:'1px solid #e2e8f0',textAlign:'center',color:'#9ca3af',fontSize:11}}>{p.stt}</td>
+                  <td style={{padding:'6px 9px',border:'1px solid #e2e8f0',fontWeight:600,fontSize:12}}>{p.item}</td>
+                  <td style={{padding:'6px 9px',border:'1px solid #e2e8f0',fontFamily:'monospace',fontSize:11,color:'#059669',fontWeight:700}}>{p.maCode}</td>
+                  <td style={{padding:'4px 8px',border:'1px solid #e2e8f0',minWidth:90}}>
+                    {numInput(p.tonKho, v=>updateGV(p._id,'tonKho',v), p.tonKho===0?'#dc2626':'#374151')}
+                  </td>
+                  <td style={{padding:'4px 8px',border:'1px solid #e2e8f0',minWidth:100}}>
+                    {numInput(p.orderQty, v=>updateGV(p._id,'orderQty',v), '#1d4ed8')}
+                  </td>
+                  <td style={{padding:'6px 9px',border:'1px solid #e2e8f0',fontSize:11,color:'#6b7280',textAlign:'center'}}>{p.unit}</td>
+                  <td style={{padding:'6px 9px',border:'1px solid #e2e8f0',fontSize:11,color:'#6b7280',whiteSpace:'nowrap'}}>{p.leadtime}</td>
+                  <td style={{padding:'4px 8px',border:'1px solid #e2e8f0',minWidth:160}}>
+                    {txtInput(p.target, v=>updateGV(p._id,'target',v))}
+                  </td>
+                  <td style={{padding:'4px 8px',border:'1px solid #e2e8f0',minWidth:120}}>
+                    {selInput(p.status, v=>updateGV(p._id,'status',v), [
+                      {v:'done',l:'✓ Đã xong'},{v:'in_progress',l:'⟳ Đang giao'},{v:'pending',l:'⧗ Chưa về'}
+                    ])}
+                  </td>
+                </tr>
+              ))}
+              <tr style={{background:'#dcfce7',fontWeight:700}}>
+                <td colSpan={3} style={{padding:'7px 10px',border:'1px solid #bbf7d0',fontWeight:800,color:'#15803d',fontSize:12}}>TỔNG / 合計</td>
+                <td style={{padding:'7px 10px',border:'1px solid #bbf7d0',textAlign:'right',color:'#374151',fontWeight:700}}>{totalStock.toLocaleString()}</td>
+                <td style={{padding:'7px 10px',border:'1px solid #bbf7d0',textAlign:'right',color:'#1d4ed8',fontWeight:800}}>{totalOrdered.toLocaleString()}</td>
+                <td colSpan={4} style={{padding:'7px 10px',border:'1px solid #bbf7d0',fontSize:11,color:'#6b7280'}}>{gvRows.length} loại vật tư · Giao: 17,000–24,000 chai/ngày</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      {/* ── PHIẾU NHU CẦU NVL WM01 ── */}
+      <div style={{border:'2px solid #8b5cf6',borderRadius:10,overflow:'hidden'}}>
+        <div style={{background:'#8b5cf6',padding:'10px 18px',display:'flex',justifyContent:'space-between',alignItems:'center',flexWrap:'wrap',gap:8}}>
+          <div>
+            <div style={{color:'#fff',fontWeight:800,fontSize:15}}>PHIẾU NHU CẦU NGUYÊN LIỆU / 原料需求表</div>
+            <div style={{color:'rgba(255,255,255,.75)',fontSize:11,marginTop:2}}>Mẫu: GV03 · Phiếu WM01 · Nguồn: 3.5.原料需求表 PHIẾU NHU CẦU NGUYÊN LIỆU-V9_WM01.xlsx</div>
+          </div>
+          <div style={{color:'rgba(255,255,255,.85)',fontSize:11,textAlign:'right'}}>
+            <div style={{fontWeight:700}}>Phiếu số: GV03 · 27/02/2026</div>
+            <div>Tuần SX: 03–05/03/2026</div>
+          </div>
+        </div>
+        <div style={{background:'#faf5ff',borderBottom:'1px solid #e9d5ff',padding:'10px 18px',display:'grid',gridTemplateColumns:'repeat(3,1fr)',gap:12}}>
+          {[{l:'NGUYÊN LIỆU',v:'WM01',c:'#8b5cf6'},{l:'TỔNG YÊU CẦU',v:'116 MTS',c:'#dc2626'},{l:'SỐ NGÀY SX',v:'3 ngày (03–05/03)',c:'#374151'}].map((k,i)=>(
+            <div key={i}><div style={{fontSize:10,color:'#6b7280',fontWeight:600}}>{k.l}</div><div style={{fontWeight:700,fontSize:14,color:k.c}}>{k.v}</div></div>
+          ))}
+        </div>
+        <div style={{overflowX:'auto'}}>
+          <table style={{width:'100%',borderCollapse:'collapse',fontSize:12}}>
+            <thead>
+              <tr style={{background:'#ede9fe'}}>
+                {['Ngày SX','Nguyên Liệu','Lượng Yêu Cầu','Bộ Phận Nhận','Trạng Thái'].map((h,i)=>(
+                  <th key={i} style={{padding:'8px 12px',border:'1px solid #ddd6fe',fontSize:11,textAlign:i===2?'right':'left'}}>{h}</th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {gvMaterialRequests.map((r,i)=>(
+                <tr key={i} style={{background:i%2===0?'#fff':'#faf5ff'}}>
+                  <td style={{padding:'9px 12px',border:'1px solid #e2e8f0',fontWeight:700,color:'#8b5cf6',whiteSpace:'nowrap'}}>{r.date}</td>
+                  <td style={{padding:'9px 12px',border:'1px solid #e2e8f0',fontWeight:600}}>{r.material}</td>
+                  <td style={{padding:'9px 12px',border:'1px solid #e2e8f0',textAlign:'right',fontWeight:800,fontSize:14,color:'#dc2626'}}>{r.qty}</td>
+                  <td style={{padding:'9px 12px',border:'1px solid #e2e8f0',fontSize:11,color:'#6b7280'}}>{r.dept}</td>
+                  <td style={{padding:'9px 12px',border:'1px solid #e2e8f0'}}>
+                    <span style={{background:'#dcfce7',color:'#15803d',padding:'3px 10px',borderRadius:10,fontSize:11,fontWeight:600}}>✓ Đã thực hiện</span>
+                  </td>
+                </tr>
+              ))}
+              <tr style={{background:'#ede9fe',fontWeight:700}}>
+                <td colSpan={2} style={{padding:'8px 12px',border:'1px solid #ddd6fe',fontWeight:800,color:'#6d28d9'}}>TỔNG / 合計</td>
+                <td style={{padding:'8px 12px',border:'1px solid #ddd6fe',textAlign:'right',fontSize:14,color:'#dc2626',fontWeight:800}}>116 MTS</td>
+                <td colSpan={2} style={{padding:'8px 12px',border:'1px solid #ddd6fe',fontSize:11,color:'#6b7280'}}>3 ngày SX</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        {/* Chữ ký */}
+        <div style={{padding:'14px 20px',background:'#faf5ff',borderTop:'1px solid #e9d5ff',display:'grid',gridTemplateColumns:'1fr 1fr 1fr',gap:24}}>
+          {[{t:'Người Lập Phiếu',n:'BP Kế Hoạch'},{t:'Xác Nhận BP NVL',n:'殷賢清'},{t:'Phê Duyệt',n:'李群立 – Phó Tổng ĐH'}].map((s,i)=>(
+            <div key={i} style={{textAlign:'center',paddingTop:8,borderTop:'1px solid #8b5cf6'}}>
+              <div style={{fontSize:11,fontWeight:700,color:'#6d28d9'}}>{s.t}</div>
+              <div style={{fontSize:12,marginTop:4,color:'#374151'}}>{s.n}</div>
             </div>
           ))}
         </div>
       </div>
-      <div className="card">
-        <div className="card-title"><span className="card-title-left">📋 Đơn Hàng AV – Dữ Liệu Thực Tế<NewBadge/></span><span className="tsm cm">Nguồn: AV計算原料 BẢNG TÍNH NGUYÊN LIỆU AV.xlsx</span></div>
-        <div className="tw"><table>
-          <thead><tr><th>Tháng</th><th>Khu vực</th><th>Mã đơn</th><th>Mã SP</th><th>Quy cách</th><th style={{textAlign:'right'}}>SL</th><th style={{textAlign:'right'}}>NVL yêu cầu (kg)</th><th>Deadline</th><th>Ghi chú</th></tr></thead>
-          <tbody>
-            {avOrders.map((o,i)=>(
-              <tr key={i}>
-                <td style={{whiteSpace:'nowrap',fontSize:11}}>{o.month}</td>
-                <td><span className={`badge ${o.region==='Nội địa'?'badge-blue':o.region==='Hàn Quốc'?'badge-green':'badge-yellow'}`} style={{fontSize:10}}>{o.region}</span></td>
-                <td style={{fontFamily:'monospace',fontSize:11,color:'#0078d4'}}>{o.orderId}</td>
-                <td style={{fontFamily:'monospace',fontSize:10}}>{o.productCode}</td>
-                <td><span className="badge badge-gray" style={{fontSize:10}}>{o.spec}</span></td>
-                <td style={{textAlign:'right',fontWeight:600}}>{o.qty.toLocaleString()} {o.unit}</td>
-                <td style={{textAlign:'right',fontWeight:600,color:o.materialReq>100000?'#dc2626':'var(--text)'}}>{o.materialReq.toLocaleString()}</td>
-                <td style={{fontSize:11,whiteSpace:'pre-line',color:'var(--muted)'}}>{o.deadline}</td>
-                <td style={{fontSize:11,color:'var(--muted)'}}>{o.note}</td>
+
+      {/* ── PHÊ DUYỆT GV ── */}
+      <ApprovalFlow apv={gvApproval} setApv={setGvApproval} steps={approvalStepsGV} color="#8b5cf6" formLabel="PHIẾU NHU CẦU NVL GV03"/>
+
+      {/* ── QUY TRÌNH GV ── */}
+      <div style={{border:'2px solid #e2e8f0',borderRadius:10,overflow:'hidden'}}>
+        <div style={{background:'#f8fafc',padding:'8px 18px',borderBottom:'1px solid #e2e8f0'}}>
+          <div style={{fontWeight:700,fontSize:13}}>QUY TRÌNH SẢN XUẤT GV – 7 BƯỚC</div>
+          <div style={{fontSize:11,color:'var(--muted)',marginTop:2}}>Click vào bước để xem hướng dẫn</div>
+        </div>
+        <div style={{padding:'14px 18px'}}>
+          <WorkflowDiagram steps={gvWorkflowSteps} activeStep={gvStep} setStep={setGvStep}/>
+          {gvStep ? <StepDetail step={gvWorkflowSteps.find(s=>s.id===gvStep)}/> : <div style={{fontSize:12,color:'var(--muted)',marginTop:4}}>👆 Click để xem chi tiết</div>}
+        </div>
+      </div>
+    </div>
+  )}
+
+  /* ══ ND LINE ══ */
+  const renderNDLine = () => {
+    const totalSX2Plan = ndRows.reduce((s,w)=>s+Number(w.sx2Plan||0),0)
+    const totalSX2Actual = ndRows.reduce((s,w)=>s+(w.sx2Actual!=null?Number(w.sx2Actual):0),0)
+    const totalSX1Need = ndRows.reduce((s,w)=>s+Number(w.sx1Need||0),0)
+    const totalSX1Actual = ndRows.reduce((s,w)=>s+(w.sx1Actual!=null?Number(w.sx1Actual):0),0)
+    const updateND = (id,field,val) => setNdRows(rows=>rows.map(r=>r._id===id?{...r,[field]:val===''?null:Number(val)}:r))
+    return (
+    <div className="sg">
+      {/* ── BẢNG CHỐT NVL MIẾNG HÀNG TUẦN ── */}
+      <div style={{border:'2px solid #d97706',borderRadius:10,overflow:'hidden'}}>
+        <div style={{background:'#d97706',padding:'10px 18px',display:'flex',justifyContent:'space-between',alignItems:'center',flexWrap:'wrap',gap:8}}>
+          <div>
+            <div style={{color:'#fff',fontWeight:800,fontSize:15}}>KẾ HOẠCH CẮT NATA & CHỐT NVL MIẾNG HÀNG TUẦN</div>
+            <div style={{color:'rgba(255,255,255,.75)',fontSize:11,marginTop:2}}>Nguồn: 4.椰果切丁計劃生產二部 Kế hoạch cắt Nata.xlsx · Chốt tuần · ✏️ = ô nhập thực tế</div>
+          </div>
+          <div style={{display:'flex',gap:8}}>
+            <div style={{color:'rgba(255,255,255,.85)',fontSize:11,textAlign:'right'}}>
+              <div style={{fontWeight:700}}>T11–T12/2025</div>
+              <div>SX1 ↔ SX2 điều phối</div>
+            </div>
+            <button onClick={()=>setNdRows(ndWeeklyPlan.map((w,i)=>({...w,_id:i})))} style={{padding:'5px 10px',background:'rgba(255,255,255,.2)',color:'#fff',border:'1px solid rgba(255,255,255,.4)',borderRadius:6,cursor:'pointer',fontSize:11}}>↺ Reset</button>
+          </div>
+        </div>
+        {/* Legend */}
+        <div style={{background:'#fef9ee',borderBottom:'1px solid #fde68a',padding:'8px 18px',display:'flex',gap:20,fontSize:11,flexWrap:'wrap'}}>
+          <span style={{color:'#1e40af',fontWeight:600}}>■ SX2 – Cắt hạt / Nấu đóng gói</span>
+          <span style={{color:'#15803d',fontWeight:600}}>■ SX1 – Cấy / Thu hoạch / Cắt miếng</span>
+          <span style={{color:'#6b7280'}}>KH = Kế hoạch · TT = Thực tế · ✏️ = nhập được</span>
+        </div>
+        <div style={{overflowX:'auto'}}>
+          <table style={{width:'100%',borderCollapse:'collapse',fontSize:12}}>
+            <thead>
+              <tr>
+                <th rowSpan={2} style={{padding:'8px 12px',border:'1px solid #fde68a',background:'#fef3c7',textAlign:'center',fontSize:11,verticalAlign:'middle'}}>TUẦN SX</th>
+                <th colSpan={3} style={{padding:'7px 12px',border:'1px solid #fde68a',background:'#bfdbfe',color:'#1e40af',textAlign:'center',fontSize:11}}>SX2 – CẮT HẠT / NẤU ĐÓNG GÓI</th>
+                <th colSpan={3} style={{padding:'7px 12px',border:'1px solid #fde68a',background:'#bbf7d0',color:'#15803d',textAlign:'center',fontSize:11}}>SX1 – CẤY / THU HOẠCH / CẮT MIẾNG</th>
+                <th rowSpan={2} style={{padding:'8px 12px',border:'1px solid #fde68a',background:'#fef3c7',textAlign:'center',fontSize:11,verticalAlign:'middle'}}>✏️ Ghi Chú</th>
               </tr>
-            ))}
-          </tbody>
-        </table></div>
+              <tr>
+                {[{l:'✏️ KH (tấn)',bg:'#bfdbfe',c:'#1e40af'},{l:'✏️ TT (tấn)',bg:'#bfdbfe',c:'#1e40af'},{l:'+/−',bg:'#bfdbfe',c:'#1e40af'},
+                  {l:'✏️ Cần cấp (tấn)',bg:'#bbf7d0',c:'#15803d'},{l:'✏️ TT (tấn)',bg:'#bbf7d0',c:'#15803d'},{l:'+/−',bg:'#bbf7d0',c:'#15803d'}].map((h,i)=>(
+                  <th key={i} style={{padding:'6px 10px',border:'1px solid #fde68a',background:h.bg,color:h.c,fontSize:10,textAlign:'right'}}>{h.l}</th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {ndRows.map((w,i)=>{
+                const sx2Diff = w.sx2Actual!=null ? w.sx2Actual - w.sx2Plan : null
+                const sx1Diff = w.sx1Actual!=null ? w.sx1Actual - w.sx1Need : null
+                return (
+                <tr key={w._id} style={{background:i%2===0?'#fff':'#fffbeb'}}>
+                  <td style={{padding:'8px 12px',border:'1px solid #e2e8f0',fontWeight:700,color:'#d97706',whiteSpace:'nowrap'}}>{w.week}</td>
+                  <td style={{padding:'4px 8px',border:'1px solid #e2e8f0',background:'#eff6ff',minWidth:80}}>
+                    {numInput(w.sx2Plan, v=>updateND(w._id,'sx2Plan',String(v)), '#1e40af')}
+                  </td>
+                  <td style={{padding:'4px 8px',border:'1px solid #e2e8f0',background:'#eff6ff',minWidth:80}}>
+                    <input type="number" value={w.sx2Actual??''} onChange={e=>updateND(w._id,'sx2Actual',e.target.value)}
+                      placeholder="—" style={{width:'100%',padding:'3px 6px',border:'1px solid #bfdbfe',borderRadius:4,fontSize:12,textAlign:'right',fontWeight:700,color:w.sx2Actual!=null?(w.sx2Actual>=w.sx2Plan?'#15803d':'#dc2626'):'#9ca3af',background:'#fffff8',outline:'none',boxSizing:'border-box'}}/>
+                  </td>
+                  <td style={{padding:'8px 10px',border:'1px solid #e2e8f0',background:'#eff6ff',textAlign:'right',fontWeight:700,color:sx2Diff!=null?(sx2Diff>=0?'#15803d':'#dc2626'):'#9ca3af'}}>
+                    {sx2Diff!=null?(sx2Diff>=0?`+${sx2Diff}`:sx2Diff):'—'}
+                  </td>
+                  <td style={{padding:'4px 8px',border:'1px solid #e2e8f0',background:'#f0fdf4',minWidth:80}}>
+                    {numInput(w.sx1Need, v=>updateND(w._id,'sx1Need',String(v)), '#15803d')}
+                  </td>
+                  <td style={{padding:'4px 8px',border:'1px solid #e2e8f0',background:'#f0fdf4',minWidth:80}}>
+                    <input type="number" value={w.sx1Actual??''} onChange={e=>updateND(w._id,'sx1Actual',e.target.value)}
+                      placeholder="—" style={{width:'100%',padding:'3px 6px',border:'1px solid #bbf7d0',borderRadius:4,fontSize:12,textAlign:'right',fontWeight:700,color:w.sx1Actual!=null?'#15803d':'#9ca3af',background:'#fffff8',outline:'none',boxSizing:'border-box'}}/>
+                  </td>
+                  <td style={{padding:'8px 10px',border:'1px solid #e2e8f0',background:'#f0fdf4',textAlign:'right',fontWeight:700,color:sx1Diff!=null?(sx1Diff<=0?'#15803d':'#dc2626'):'#9ca3af'}}>
+                    {sx1Diff!=null?(sx1Diff>=0?`+${sx1Diff}`:sx1Diff):'—'}
+                  </td>
+                  <td style={{padding:'4px 8px',border:'1px solid #e2e8f0',minWidth:160}}>
+                    <input type="text" value={w.note||''} onChange={e=>setNdRows(rows=>rows.map(r=>r._id===w._id?{...r,note:e.target.value}:r))}
+                      placeholder="Ghi chú..."
+                      style={{width:'100%',padding:'3px 6px',border:'1px solid #fde68a',borderRadius:4,fontSize:11,background:'#fffff8',outline:'none',boxSizing:'border-box'}}/>
+                  </td>
+                </tr>
+              )})}
+              <tr style={{background:'#fef3c7',fontWeight:700}}>
+                <td style={{padding:'8px 12px',border:'1px solid #fde68a',fontWeight:800,color:'#92400e'}}>TỔNG / 合計</td>
+                <td style={{padding:'8px 10px',border:'1px solid #fde68a',background:'#bfdbfe',textAlign:'right',color:'#1e40af',fontWeight:800}}>{totalSX2Plan}</td>
+                <td style={{padding:'8px 10px',border:'1px solid #fde68a',background:'#bfdbfe',textAlign:'right',color:'#1e40af',fontWeight:800}}>{totalSX2Actual||'—'}</td>
+                <td style={{padding:'8px 10px',border:'1px solid #fde68a',background:'#bfdbfe'}}/>
+                <td style={{padding:'8px 10px',border:'1px solid #fde68a',background:'#bbf7d0',textAlign:'right',color:'#15803d',fontWeight:800}}>{totalSX1Need}</td>
+                <td style={{padding:'8px 10px',border:'1px solid #fde68a',background:'#bbf7d0',textAlign:'right',color:'#15803d',fontWeight:800}}>{totalSX1Actual}</td>
+                <td style={{padding:'8px 10px',border:'1px solid #fde68a',background:'#bbf7d0'}}/>
+                <td style={{padding:'8px 10px',border:'1px solid #fde68a',fontSize:11,color:'#92400e'}}>5 tuần</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div style={{padding:'10px 18px',background:'#fffbeb',borderTop:'1px solid #fde68a',display:'grid',gridTemplateColumns:'repeat(4,1fr)',gap:12}}>
+          {[{l:'TỔNG KH SX2',v:totalSX2Plan,u:'tấn',c:'#d97706'},{l:'SX2 THỰC TẾ',v:totalSX2Actual,u:'tấn',c:'#15803d'},{l:'SX1 CẦN CẤP',v:totalSX1Need,u:'tấn',c:'#1d4ed8'},{l:'SX1 THỰC HIỆN',v:totalSX1Actual,u:'tấn',c:'#15803d'}].map((k,i)=>(
+            <div key={i}><div style={{fontSize:10,color:'#6b7280',fontWeight:600}}>{k.l}</div><div style={{fontWeight:800,fontSize:20,color:k.c}}>{k.v}<span style={{fontSize:12,fontWeight:400}}> {k.u}</span></div></div>
+          ))}
+        </div>
       </div>
-    </div>
-  )
 
-  /* ── GV LINE TAB ── */
-  const renderGVLine = () => (
-    <div className="sg">
-      <div className="card" style={{border:'2px solid #05996922'}}>
-        <div className="card-title"><span className="card-title-left">🔄 Quy Trình Kế Hoạch GV<NewBadge/></span><span className="tsm cm">Nguồn: Folder GV排程 KẾ HOẠCH GV</span></div>
-        <WorkflowDiagram steps={gvWorkflowSteps} activeStep={gvStep} setStep={setGvStep}/>
-        {gvStep && <StepDetail step={gvWorkflowSteps.find(s=>s.id===gvStep)}/>}
-        {!gvStep && <p className="tsm cm mt4">👆 Click vào bước để xem hướng dẫn chi tiết</p>}
-      </div>
-      <div className="card">
-        <div className="card-title">
-          <span className="card-title-left">🍶 Tiến Độ Bao Bì Chai – VN-26020018 / VMX-AP244-RAL-T1 CLASSY<NewBadge/></span>
-          <span className="tsm" style={{color:'#059669',fontWeight:600}}>8 container · 160 pallets · 322,572 chai</span>
-        </div>
-        <div className="tw"><table>
-          <thead><tr><th>#</th><th>Bao bì</th><th>Mã</th><th style={{textAlign:'right'}}>Tồn kho</th><th style={{textAlign:'right'}}>Cần mua</th><th>Lịch giao hàng</th><th>Trạng thái</th><th>Lead time</th><th>Tốc độ</th></tr></thead>
-          <tbody>{gvPackaging.map((p,i)=>(
-            <tr key={i}>
-              <td style={{fontWeight:700,color:'#0078d4'}}>{p.stt}</td>
-              <td style={{fontWeight:500}}>{p.item}</td>
-              <td style={{fontFamily:'monospace',fontSize:11,color:'#8b5cf6'}}>{p.maCode}</td>
-              <td style={{textAlign:'right'}}>{p.tonKho.toLocaleString()}</td>
-              <td style={{textAlign:'right',fontWeight:600,color:p.orderQty>100000?'#dc2626':'var(--text)'}}>{p.orderQty.toLocaleString()} {p.unit}</td>
-              <td style={{fontSize:11,color:'var(--muted)',maxWidth:200,whiteSpace:'pre-line',lineHeight:1.4}}>{p.target}</td>
-              <td><span className={`badge ${p.status==='done'?'badge-green':p.status==='in_progress'?'badge-blue':'badge-gray'}`}>{p.status==='done'?'✅ Xong':p.status==='in_progress'?'⚡ Đang giao':'⏳ Chờ'}</span></td>
-              <td style={{fontSize:11,color:'var(--muted)'}}>{p.leadtime}</td>
-              <td style={{fontSize:11,color:'var(--muted)'}}>{p.dailyRate}</td>
-            </tr>
-          ))}</tbody>
-        </table></div>
-      </div>
-      <div className="card">
-        <div className="card-title"><span className="card-title-left">📋 Phiếu Nhu Cầu Nguyên Liệu – WM01<NewBadge/></span><span className="tsm cm">Nguồn: Phiếu GV03 – 2026/02/27</span></div>
-        <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:16}}>
-          <div>
-            <div style={{background:'#f8fafc',borderRadius:8,padding:14,border:'1px solid var(--border)'}}>
-              <div style={{fontWeight:700,fontSize:13,marginBottom:10,color:'#0078d4'}}>PHIẾU NHU CẦU NGUYÊN LIỆU – GV03</div>
-              <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:8,marginBottom:12}}>
-                <div><div style={{fontSize:10,color:'var(--muted)'}}>Mã số đơn</div><div style={{fontWeight:600}}>GV03</div></div>
-                <div><div style={{fontSize:10,color:'var(--muted)'}}>Ngày lập biểu</div><div style={{fontWeight:600}}>2026/02/27</div></div>
-                <div><div style={{fontSize:10,color:'var(--muted)'}}>Người lập</div><div style={{fontWeight:600}}>殷賢清</div></div>
-                <div><div style={{fontSize:10,color:'var(--muted)'}}>Phó Tổng ĐH</div><div style={{fontWeight:600}}>李群立</div></div>
-              </div>
-              <table style={{width:'100%',fontSize:12}}>
-                <thead><tr style={{background:'#e8f4fd'}}><th style={{padding:'6px 8px',textAlign:'left'}}>Nguyên liệu</th><th style={{padding:'6px 8px',textAlign:'center'}}>Ngày nhu cầu</th><th style={{padding:'6px 8px',textAlign:'right'}}>Lượng</th></tr></thead>
-                <tbody>
-                  {gvMaterialRequests.map((r,i)=>(
-                    <tr key={i}><td style={{padding:'5px 8px',fontWeight:600,color:'#8b5cf6'}}>{r.material}</td><td style={{padding:'5px 8px',textAlign:'center'}}>{r.date}</td><td style={{padding:'5px 8px',textAlign:'right',fontWeight:700,color:'#059669'}}>{r.qty}</td></tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </div>
-          <div>
-            <div style={{background:'#f0fdf4',borderRadius:8,padding:14,border:'1px solid #bbf7d0',marginBottom:12}}>
-              <div style={{fontWeight:600,fontSize:12,color:'#059669',marginBottom:8}}>📊 Tổng NVL 3 ngày đầu tháng</div>
-              <div style={{fontSize:24,fontWeight:800,color:'#059669'}}>116 MTS</div>
-              <div style={{fontSize:11,color:'var(--muted)'}}>WM01 · 03/03 – 05/03/2026</div>
-            </div>
-            <div style={{background:'#fef9c3',borderRadius:8,padding:14,border:'1px solid #fde68a'}}>
-              <div style={{fontWeight:600,fontSize:12,color:'#92400e',marginBottom:6}}>⚠️ Lưu ý xử lý đường</div>
-              <div style={{fontSize:11,color:'#78350f',lineHeight:1.6}}>Kỹ Thuật cung cấp thông số xử lý/pha đường (file 技術提供融糖). Gửi mail xác nhận lượng đường sử dụng mỗi ca (file 郵件提供糖量).</div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  )
+      {/* ── PHÊ DUYỆT ND ── */}
+      <ApprovalFlow apv={ndApproval} setApv={setNdApproval} steps={approvalStepsND} color="#d97706" formLabel="BẢNG CHỐT NVL MIẾNG TUẦN"/>
 
-  /* ── ND LINE TAB ── */
-  const renderNDLine = () => (
-    <div className="sg">
-      <div className="card" style={{border:'2px solid #d9770622'}}>
-        <div className="card-title"><span className="card-title-left">🔄 Quy Trình Kế Hoạch ND (Nata de Coco)<NewBadge/></span><span className="tsm cm">Nguồn: Folder ND排程 Kế Hoạch ND</span></div>
-        <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:12,marginBottom:12}}>
-          <div style={{background:'#f0fdf4',borderRadius:8,padding:10,border:'1px solid #bbf7d0'}}>
-            <div style={{fontWeight:700,fontSize:12,color:'#059669',marginBottom:4}}>🌱 SX1 – Sản Xuất 1</div>
-            <div style={{fontSize:11,color:'#065f46'}}>Cấy giống → Thu hoạch → Cắt miếng → Chuyển cho SX2</div>
-          </div>
-          <div style={{background:'#eff6ff',borderRadius:8,padding:10,border:'1px solid #bfdbfe'}}>
-            <div style={{fontWeight:700,fontSize:12,color:'#1d4ed8',marginBottom:4}}>⚡ SX2 – Sản Xuất 2</div>
-            <div style={{fontSize:11,color:'#1e3a8a'}}>Nhận miếng từ SX1 → Cắt hạt/dạng → Nấu → Đóng gói</div>
-          </div>
+      {/* ── QUY TRÌNH ND ── */}
+      <div style={{border:'2px solid #e2e8f0',borderRadius:10,overflow:'hidden'}}>
+        <div style={{background:'#f8fafc',padding:'8px 18px',borderBottom:'1px solid #e2e8f0'}}>
+          <div style={{fontWeight:700,fontSize:13}}>QUY TRÌNH SX NATA DE COCO – SX1 → SX2 (7 BƯỚC)</div>
+          <div style={{fontSize:11,color:'var(--muted)',marginTop:2}}>Click vào bước để xem hướng dẫn chi tiết</div>
         </div>
-        <WorkflowDiagram steps={ndWorkflowSteps} activeStep={ndStep} setStep={setNdStep} compact/>
-        {ndStep && <StepDetail step={ndWorkflowSteps.find(s=>s.id===ndStep)}/>}
-        {!ndStep && <p className="tsm cm mt4">👆 Click vào bước để xem hướng dẫn chi tiết</p>}
-      </div>
-      <div className="card">
-        <div className="card-title"><span className="card-title-left">📊 Chốt Nguyên Liệu Miếng Hàng Tuần – SX1 ↔ SX2<NewBadge/></span><span className="tsm cm">Nguồn: Kế hoạch cắt Nata 20260302.xlsx</span></div>
-        <div className="tw"><table>
-          <thead>
-            <tr>
-              <th rowSpan={2} style={{verticalAlign:'bottom'}}>Tuần</th>
-              <th colSpan={4} style={{textAlign:'center',background:'#eff6ff',color:'#1d4ed8'}}>⚡ SX2 Nhập (Tấn)</th>
-              <th colSpan={4} style={{textAlign:'center',background:'#f0fdf4',color:'#065f46'}}>🌱 SX1 Nhập (Tấn)</th>
-            </tr>
-            <tr>
-              <th style={{background:'#eff6ff'}}>KH Cắt SX2</th><th style={{background:'#eff6ff'}}>Thực tế</th><th style={{background:'#eff6ff'}}>Chênh lệch</th><th style={{background:'#eff6ff'}}>Nguyên nhân</th>
-              <th style={{background:'#f0fdf4'}}>SX1 cần cung cấp</th><th style={{background:'#f0fdf4'}}>SX1 nhập kho</th><th style={{background:'#f0fdf4'}}>Chênh lệch</th><th style={{background:'#f0fdf4'}}>Nguyên nhân</th>
-            </tr>
-          </thead>
-          <tbody>{ndWeeklyPlan.map((w,i)=>(
-            <tr key={i}>
-              <td style={{fontWeight:600,whiteSpace:'nowrap',fontSize:11}}>{w.week}</td>
-              <td style={{textAlign:'right',fontWeight:600,color:'#1d4ed8'}}>{w.sx2Plan}</td>
-              <td style={{textAlign:'right'}}>{w.sx2Actual??'—'}</td>
-              <td style={{textAlign:'right',color:w.sx2Diff<0?'#059669':w.sx2Diff>0?'#dc2626':'var(--muted)',fontWeight:600}}>{w.sx2Diff>0?'+':''}{w.sx2Diff}</td>
-              <td style={{fontSize:10,color:'var(--muted)'}}>{w.note.split('/')[0]||''}</td>
-              <td style={{textAlign:'right',fontWeight:600,color:'#065f46'}}>{w.sx1Need}</td>
-              <td style={{textAlign:'right'}}>{w.sx1Actual??'—'}</td>
-              <td style={{textAlign:'right',color:w.sx1Diff<0?'#059669':w.sx1Diff>0?'#dc2626':'var(--muted)',fontWeight:600}}>{w.sx1Diff>0?'+':''}{w.sx1Diff}</td>
-              <td style={{fontSize:10,color:'var(--muted)'}}>{w.note.split('/')[1]||''}</td>
-            </tr>
-          ))}</tbody>
-        </table></div>
-        <div className="al al-blue mt12">{'💡 Phân tích: SX1 chuẩn bị sẵn 30 tấn cho tuần 15-21/11. Tuần tiếp theo SX2 cần thêm 49 tấn – SX1 cần cấy bổ sung đủ cho 22/11.'}</div>
-        <div className="sg4 mt16">
-          <div className="sc"><div className="sc-label">Tổng tuần theo dõi</div><div className="sc-value">5</div><div className="sc-sub">tuần / 2 tháng</div></div>
-          <div className="sc"><div className="sc-label">Trung bình SX2/tuần</div><div className="sc-value">50T</div><div className="sc-sub">Kế hoạch: 49T</div></div>
-          <div className="sc"><div className="sc-label">SX1 chuẩn bị trước</div><div className="sc-value">30T</div><div className="sc-sub">cho tuần đầu</div></div>
-          <div className="sc"><div className="sc-label">Sản phẩm theo dõi</div><div className="sc-value">WM01</div><div className="sc-sub">1 loại NVL</div></div>
+        <div style={{padding:'14px 18px'}}>
+          <WorkflowDiagram steps={ndWorkflowSteps} activeStep={ndStep} setStep={setNdStep}/>
+          {ndStep ? <StepDetail step={ndWorkflowSteps.find(s=>s.id===ndStep)}/> : <div style={{fontSize:12,color:'var(--muted)',marginTop:4}}>👆 Click để xem chi tiết từng bước SX1/SX2</div>}
         </div>
       </div>
     </div>
-  )
+  )}
 
-  /* ── CUSTOMER FLOW TAB ── */
   const renderCustomerFlow = () => (
     <div className="sg">
       <div className="card" style={{border:'2px solid #be185d22'}}>

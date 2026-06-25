@@ -1,0 +1,101 @@
+/* ============================================================
+   PLAN-UI — Giao diện trực quan, gọn gàng, chuyên nghiệp
+   cho phần Sản Xuất (生管部 V1.1)
+   Scope: chỉ áp dụng trong .plan-ui
+   ============================================================ */
+
+.plan-ui { font-size: 15px; }
+
+/* ---------- Tiêu đề trang ---------- */
+.plan-ui .ph { margin-bottom: 22px; }
+.plan-ui .ph h1 { font-size: 26px; font-weight: 800; letter-spacing: -0.01em; }
+.plan-ui .ph p { font-size: 14.5px; margin-top: 5px; line-height: 1.5; }
+
+/* ---------- Thẻ / Card ---------- */
+.plan-ui .card {
+  padding: 20px 22px;
+  border-radius: 14px;
+  box-shadow: 0 1px 3px rgba(16,24,40,.06), 0 1px 2px rgba(16,24,40,.04);
+}
+.plan-ui .card-title { font-size: 16.5px; font-weight: 700; margin-bottom: 15px; }
+.plan-ui .card-title-left { gap: 9px; }
+
+/* ---------- KPI Stat cards: tự dàn đều, không xếp dọc ---------- */
+.plan-ui .g4 {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)) !important;
+  gap: 16px;
+}
+.plan-ui .sc {
+  padding: 18px 20px;
+  border-radius: 14px;
+  border: 1px solid var(--border);
+  box-shadow: 0 1px 3px rgba(16,24,40,.06);
+  transition: transform .12s, box-shadow .12s;
+}
+.plan-ui .sc:hover { transform: translateY(-2px); box-shadow: 0 6px 16px rgba(16,24,40,.10); }
+.plan-ui .sc-label { font-size: 14px; font-weight: 600; }
+.plan-ui .sc-value { font-size: 34px; font-weight: 800; margin: 6px 0 2px; }
+.plan-ui .sc-sub { font-size: 12.5px; }
+
+/* ---------- Lưới 2/3 cột: giữ cạnh nhau, căn trên ---------- */
+.plan-ui .g2, .plan-ui .g3 { gap: 18px; align-items: start; }
+
+/* ---------- Bảng: thoáng, chữ to ---------- */
+.plan-ui table { font-size: 14.5px; }
+.plan-ui th {
+  font-size: 13px; font-weight: 700; padding: 12px 15px;
+  text-transform: none; color: #475467; background: #f4f7fb;
+  border-bottom: 2px solid var(--border); line-height: 1.35;
+}
+.plan-ui td { padding: 12px 15px; font-size: 14.5px; line-height: 1.45; }
+.plan-ui tbody tr { transition: background .1s; }
+.plan-ui tbody tr:hover td { background: var(--blue-xlight); }
+.plan-ui .tw { border-radius: 10px; border: 1px solid var(--border); overflow: auto; }
+.plan-ui .tsm { font-size: 14px; line-height: 1.45; }
+
+/* ---------- Badge ---------- */
+.plan-ui .badge { font-size: 12.5px; font-weight: 600; padding: 4px 11px; border-radius: 8px; }
+
+/* ---------- Tabs ---------- */
+.plan-ui .tabs { gap: 4px; margin-bottom: 20px; border-bottom-width: 2px; }
+.plan-ui .tab { font-size: 15px; font-weight: 600; padding: 11px 20px; border-radius: 9px 9px 0 0; }
+.plan-ui .tab.active { background: var(--blue-xlight); }
+
+/* ---------- Timeline ---------- */
+.plan-ui .tl-item { gap: 14px; padding-bottom: 18px; }
+.plan-ui .tl-item:not(:last-child)::before { left: 18px; top: 40px; width: 2px; }
+.plan-ui .tl-dot { width: 38px; height: 38px; font-size: 17px; }
+.plan-ui .tl-title { font-size: 15.5px; font-weight: 700; }
+.plan-ui .tl-meta { font-size: 13.5px; margin-top: 3px; line-height: 1.45; }
+
+/* ---------- Alert ---------- */
+.plan-ui .al { font-size: 14.5px; padding: 14px 18px; border-radius: 12px; gap: 11px; }
+.plan-ui .al .fw6 { font-size: 15px; }
+
+/* ---------- Form ---------- */
+.plan-ui .fr { gap: 6px; }
+.plan-ui .fr label { font-size: 13px; font-weight: 600; color: #475467; }
+.plan-ui .fr input, .plan-ui .fr select, .plan-ui .fr textarea {
+  font-size: 14.5px; padding: 10px 12px; border-radius: 8px;
+}
+.plan-ui .fg2, .plan-ui .fg3, .plan-ui .fg4 { gap: 14px 16px; }
+
+/* ---------- Nút ---------- */
+.plan-ui .btn { font-size: 14.5px; font-weight: 600; padding: 11px 20px; border-radius: 9px; }
+.plan-ui .btn-primary { box-shadow: 0 2px 6px rgba(26,86,219,.25); }
+.plan-ui .w100 { width: 100%; justify-content: center; }
+
+/* ---------- Meter ---------- */
+.plan-ui .meter-row { padding: 11px 0; }
+.plan-ui .meter-label { font-size: 14.5px; width: 180px; }
+.plan-ui .meter-bar { height: 11px; border-radius: 6px; }
+.plan-ui .meter-val { font-size: 14.5px; width: 70px; }
+
+/* ---------- Muted text ---------- */
+.plan-ui .cm { color: #667085; }
+
+/* ---------- Responsive: chỉ xếp dọc khi màn hình thật sự hẹp ---------- */
+@media (max-width: 720px) {
+  .plan-ui .g2, .plan-ui .g3 { grid-template-columns: 1fr !important; }
+}

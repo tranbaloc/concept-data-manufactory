@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
+import { BrowserRouter, Routes, Route, Navigate, useParams } from 'react-router-dom'
 import { LangProvider } from './i18n/context'
 import Layout from './components/Layout'
 import Dashboard from './pages/Dashboard'
@@ -7,6 +7,10 @@ import BatchCalculation from './pages/rd/BatchCalculation'
 import FormulaComparison from './pages/rd/FormulaComparison'
 import BOMAnalysis from './pages/rd/BOMAnalysis'
 import ProductionSchedule from './pages/planning/ProductionSchedule'
+import OrderControl from './pages/planning/OrderControl'
+import MaterialAnalysis from './pages/planning/MaterialAnalysis'
+import DeliveryConfirm from './pages/planning/DeliveryConfirm'
+import ProductionOrderIssue from './pages/planning/ProductionOrderIssue'
 import EquipmentMaintenance from './pages/facilities/EquipmentMaintenance'
 import EnergyManagement from './pages/facilities/EnergyManagement'
 import ProductionSupport from './pages/facilities/ProductionSupport'
@@ -32,6 +36,11 @@ import AcceptanceSpecs from './pages/orders/AcceptanceSpecs'
 import ProductConfirm from './pages/orders/ProductConfirm'
 import ProductionOrder from './pages/orders/ProductionOrder'
 import EngineeringChange from './pages/orders/EngineeringChange'
+
+function Keyed({ Comp }) {
+  const { line } = useParams()
+  return <Comp key={line} />
+}
 
 export default function App() {
   return (
@@ -60,8 +69,17 @@ export default function App() {
           <Route path="rd/formula-compare" element={<FormulaComparison />} />
           <Route path="rd/bom" element={<BOMAnalysis />} />
 
-          {/* Planning */}
+          {/* Planning – 生管部 V1.1 · 3 Line AV/ND/GV */}
+          <Route path="planning/:line/order-control" element={<Keyed Comp={OrderControl} />} />
+          <Route path="planning/:line/material-analysis" element={<Keyed Comp={MaterialAnalysis} />} />
+          <Route path="planning/:line/delivery-confirm" element={<Keyed Comp={DeliveryConfirm} />} />
+          <Route path="planning/:line/production-order" element={<Keyed Comp={ProductionOrderIssue} />} />
           <Route path="planning/schedule" element={<ProductionSchedule />} />
+          {/* Redirect đường dẫn cũ → line AV */}
+          <Route path="planning/order-control" element={<Navigate to="/planning/av/order-control" replace />} />
+          <Route path="planning/material-analysis" element={<Navigate to="/planning/av/material-analysis" replace />} />
+          <Route path="planning/delivery-confirm" element={<Navigate to="/planning/av/delivery-confirm" replace />} />
+          <Route path="planning/production-order" element={<Navigate to="/planning/av/production-order" replace />} />
 
           {/* Facilities */}
           <Route path="facilities/equipment" element={<EquipmentMaintenance />} />
